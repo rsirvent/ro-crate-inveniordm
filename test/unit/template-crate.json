@@ -1,0 +1,33 @@
+{
+    "@context": "https://w3id.org/ro/crate/1.1/context",
+    "@graph": [
+        {
+            "@type": "CreativeWork",
+            "@id": "ro-crate-metadata.json",
+            "conformsTo": {
+                "@id": "https://w3id.org/ro/crate/1.1"
+            },
+            "about": {
+                "@id": "./"
+            }
+        },
+        {
+            "@id": "./",
+            "identifier": "",
+            "@type": "Dataset",
+            "datePublished": "",
+            "name": "",
+            "description": "",
+            "license": "",
+            "keywords": [],
+            "author": [],
+            "publisher": "",
+            "encodingFormat": [],
+            "inLanguage": "",
+            "version": "",
+            "funder": "",
+            "contentLocation": "",
+            "temporalCoverage": ""
+        }
+    ]
+}
