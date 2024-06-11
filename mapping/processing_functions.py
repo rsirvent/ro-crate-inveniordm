@@ -1,6 +1,5 @@
 def dateProcessing(value):
     from dateutil.parser import parse
-    from datetime import datetime
 
     if value == None:
         return None
@@ -11,8 +10,6 @@ def dateProcessing(value):
 
     fuzzy_date = parse(value, fuzzy=True)
     return fuzzy_date and fuzzy_date.strftime("%Y-%m-%d")
-
-    return value
 
 
 def geonamesProcessing(value):
