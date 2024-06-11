@@ -70,20 +70,7 @@ def convert(rc, metadata_only=False):
 
         mappings = root_mappings.get("mappings")
 
-        # retrieve all array values
-        all_from_values = []
-        for key in mappings:
-            mapping = mappings.get(key)
-            from_value = mapping.get("from")
-            if from_value != None:
-                all_from_values.append(from_value)
-
-        array_values = get_arrays_from_from_values(all_from_values)
-
-        # Extract all possible paths (used for arrays)
-        mapping_paths = {}
-        for i in array_values:
-            mapping_paths[i] = get_paths(rc, i)
+        mapping_paths = get_mapping_paths(rc, mappings)
 
         print(f"\t\t|- Paths: {mapping_paths}")
 
@@ -93,63 +80,7 @@ def convert(rc, metadata_only=False):
             print(f"\t|- Applying mapping {mapping_key}")
 
             mapping = mappings.get(mapping_key)
-
-            if "_ignore" in mapping.keys():
-                continue
-
-            from_mapping_value = mapping.get("from")
-            to_mapping_value = mapping.get("to")
-            value_mapping_value = mapping.get("value")
-            processing_mapping_value = mapping.get("processing")
-            only_if_value = mapping.get("onlyIf")
-
-            # The following steps are performed:
-            # 1. Get the value from the RO-Crate (from)
-            # 2. Check if the rule should be applied (onlyIf)
-            # 3. Process the value (processing)
-            # 4. Put the value into the correct format (value)
-            # 5. Add the value to the DataCite object (to)
-
-            # Get the correct mapping paths. change this. now it is overriden
-            paths = [[]]
-
-            if from_mapping_value:
-                delimiter_index = from_mapping_value.rfind("[]")
-            else:
-                delimiter_index = -1
-
-            if delimiter_index != -1:
-                processed_string = from_mapping_value[: delimiter_index + 2]
-                paths = mapping_paths.get(processed_string)
-                print(f"\t\t|- Paths: {paths}")
-
-            for path in paths:
-                print(f"PATH: {path}")
-                new_path = path.copy()
-                from_value = get_rc(rc.copy(), from_mapping_value, new_path)
-
-                # if (from_value == None):
-                #    continue
-
-                if only_if_value != None:
-                    print(f"\t\t|- Checking condition {only_if_value}")
-                    if not check_condition(only_if_value, from_value):
-                        continue
-
-                if processing_mapping_value:
-                    from_value = process(processing_mapping_value, from_value)
-
-                if value_mapping_value:
-                    from_value = transform_to_target_format(
-                        value_mapping_value, from_value
-                    )
-
-                if from_value != None:
-                    print(
-                        f"\t\t|- Adding {from_value} to {to_mapping_value} with path {path.copy()}"
-                    )
-                    dc = set_dc(dc, to_mapping_value, from_value, path.copy())
-                    is_any_present = True
+            dc, is_any_present = apply_mapping(mapping, mapping_paths, rc, dc)
 
         if not is_any_present:
             none_present_value = root_mappings.get("ifNonePresent")
@@ -162,6 +93,84 @@ def convert(rc, metadata_only=False):
                     dc = set_dc(dc, none_present_key, none_present_mapping_value)
 
     return dc
+
+
+def get_mapping_paths(rc, mappings):
+    # retrieve all array values
+    all_from_values = []
+    for key in mappings:
+        mapping = mappings.get(key)
+        from_value = mapping.get("from")
+        if from_value != None:
+            all_from_values.append(from_value)
+
+    array_values = get_arrays_from_from_values(all_from_values)
+
+    # Extract all possible paths (used for arrays)
+    mapping_paths = {}
+    for i in array_values:
+        mapping_paths[i] = get_paths(rc, i)
+
+
+def apply_mapping(mapping, mapping_paths, rc, dc):
+    rule_applied = False
+
+    if "_ignore" in mapping.keys():
+        return None, rule_applied
+
+    from_mapping_value = mapping.get("from")
+    to_mapping_value = mapping.get("to")
+    value_mapping_value = mapping.get("value")
+    processing_mapping_value = mapping.get("processing")
+    only_if_value = mapping.get("onlyIf")
+
+    # The following steps are performed:
+    # 1. Get the value from the RO-Crate (from)
+    # 2. Check if the rule should be applied (onlyIf)
+    # 3. Process the value (processing)
+    # 4. Put the value into the correct format (value)
+    # 5. Add the value to the DataCite object (to)
+
+    # Get the correct mapping paths. change this. now it is overriden
+    paths = [[]]
+
+    if from_mapping_value:
+        delimiter_index = from_mapping_value.rfind("[]")
+    else:
+        delimiter_index = -1
+
+    if delimiter_index != -1:
+        processed_string = from_mapping_value[: delimiter_index + 2]
+        paths = mapping_paths.get(processed_string)
+        print(f"\t\t|- Paths: {paths}")
+
+    for path in paths:
+        print(f"PATH: {path}")
+        new_path = path.copy()
+        from_value = get_rc(rc.copy(), from_mapping_value, new_path)
+
+        # if (from_value == None):
+        #    continue
+
+        if only_if_value != None:
+            print(f"\t\t|- Checking condition {only_if_value}")
+            if not check_condition(only_if_value, from_value):
+                return None, rule_applied
+
+        if processing_mapping_value:
+            from_value = process(processing_mapping_value, from_value)
+
+        if value_mapping_value:
+            from_value = transform_to_target_format(value_mapping_value, from_value)
+
+        if from_value != None:
+            print(
+                f"\t\t|- Adding {from_value} to {to_mapping_value} with path {path.copy()}"
+            )
+            rule_applied = True
+            dc = set_dc(dc, to_mapping_value, from_value, path.copy())
+
+    return dc, rule_applied
 
 
 def get_paths(rc, key):
