@@ -9,7 +9,10 @@ def dateProcessing(value):
         return value
 
     fuzzy_date = parse(value, fuzzy=True)
-    return fuzzy_date and fuzzy_date.strftime("%Y-%m-%d")
+    if not fuzzy_date:
+        print("Warning: Date {date} could not be parsed.")
+        return None
+    return fuzzy_date.strftime("%Y-%m-%d")
 
 
 def geonamesProcessing(value):
@@ -73,7 +76,10 @@ def embargoDateProcessing(value):
     if value == None:
         return None
     fuzzy_date = parse(value, fuzzy=True)
-    return fuzzy_date and fuzzy_date.strftime("%Y-%m-%d")
+    if not fuzzy_date:
+        print("Warning: Date {date} could not be parsed.")
+        return None
+    return fuzzy_date.strftime("%Y-%m-%d")
 
 
 def convert_to_iso_639_3(value):
