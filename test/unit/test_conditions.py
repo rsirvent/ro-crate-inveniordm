@@ -22,6 +22,12 @@ def test_is_uri__empty():
     assert not cf.is_uri(input)
 
 
+def test_is_uri__none():
+    input = None
+
+    assert not cf.is_uri(input)
+
+
 def test_is_not_uri__true():
     input = "example.org"
 
@@ -36,6 +42,12 @@ def test_is_not_uri__false():
 
 def test_is_not_uri__empty():
     input = ""
+
+    assert not cf.is_not_uri(input)
+
+
+def test_is_not_uri__none():
+    input = None
 
     assert not cf.is_not_uri(input)
 
@@ -70,6 +82,11 @@ def test_doi__empty():
     assert not cf.doi(input)
 
 
+def test_doi__none():
+    input = None
+    assert not cf.doi(input)
+
+
 def test_orcid__true():
     input = "https://orcid.org/0000-0000-0000-0000"
     assert cf.orcid(input)
@@ -82,6 +99,11 @@ def test_orcid__false():
 
 def test_orcid__empty():
     input = ""
+    assert not cf.orcid(input)
+
+
+def test_orcid__none():
+    input = None
     assert not cf.orcid(input)
 
 
@@ -119,6 +141,12 @@ def test_embargoed__empty():
     assert not cf.embargoed(input)
 
 
+def test_embargoed__none():
+    input = None
+
+    assert not cf.embargoed(input)
+
+
 def test_string__true():
     input = "this is a string"
 
@@ -132,5 +160,11 @@ def test_string__false(input):
 
 def test_string__empty():
     input = ""
+
+    assert not cf.string(input)
+
+
+def test_string__none():
+    input = None
 
     assert not cf.string(input)
