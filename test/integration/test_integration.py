@@ -1,4 +1,5 @@
 import os
+import subprocess
 import shutil
 import json
 import pytest
@@ -15,13 +16,20 @@ def test_created_datacite_files(crate_name):
     with open(compare_path) as expected:
         expected_json = json.load(expected)
 
-    exit_code = os.system(f"python deposit.py {crate_path}")
+    # note - check_output raises CalledProcessError if exit code is non-zero
+    log = subprocess.check_output(
+        f"python deposit.py {crate_path}", shell=True, text=True
+    )
     output_file = "datacite-out.json"
     shutil.copyfile(
         output_file, os.path.join(TEST_OUTPUT_FOLDER, f"datacite-out-{crate_name}.json")
     )
+    with open(
+        os.path.join(TEST_OUTPUT_FOLDER, f"log-{crate_name}.txt"),
+        "w",
+    ) as log_file:
+        log_file.write(log)
 
-    assert exit_code == 0
     assert os.path.exists(output_file)
     with open(output_file) as output:
         output_json = json.load(output)

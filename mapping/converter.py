@@ -80,7 +80,8 @@ def convert(rc, metadata_only=False):
             print(f"\t|- Applying mapping {mapping_key}")
 
             mapping = mappings.get(mapping_key)
-            dc, is_any_present = apply_mapping(mapping, mapping_paths, rc, dc)
+            dc, any_present = apply_mapping(mapping, mapping_paths, rc, dc)
+            is_any_present = is_any_present or any_present
 
         if not is_any_present:
             none_present_value = root_mappings.get("ifNonePresent")
