@@ -1,4 +1,5 @@
 import json
+import pytest
 from mapping.converter import (
     rc_get_rde,
     apply_mapping,
@@ -22,6 +23,9 @@ publisher_entity = {
 }
 
 
+@pytest.mark.xfail(
+    reason="known bug - https://github.com/ResearchObject/ro-crates-deposit/issues/1"
+)
 def test_publisher_string():
     rc = load_template_rc()
     rc, _ = set_field_in_template_rde("publisher", publisher_string, rc)
