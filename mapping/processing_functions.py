@@ -1,7 +1,7 @@
 def dateProcessing(value):
     from dateutil.parser import parse
 
-    if value == None:
+    if not value:
         return None
 
     if len(value) == 4:
