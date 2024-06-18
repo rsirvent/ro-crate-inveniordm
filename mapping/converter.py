@@ -575,7 +575,7 @@ def process(process_rule, value):
     :return: The processed value.
     """
     if not process_rule.startswith("$"):
-        raise Exception(f"Processing rule {process_rule} must start with $")
+        raise ValueError(f"Processing rule {process_rule} must start with $")
     try:
         function = getattr(pf, process_rule[1:])
     except AttributeError:
