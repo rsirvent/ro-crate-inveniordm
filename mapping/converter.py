@@ -556,7 +556,7 @@ def check_condition(condition_rule, value):
     :return: True if the value matches the condition, False otherwise.
     """
     if not condition_rule.startswith("?"):
-        raise Exception(f"Condition rule {condition_rule} must start with ?")
+        raise ValueError(f"Condition rule {condition_rule} must start with ?")
     try:
         function = getattr(cf, condition_rule[1:])
     except AttributeError:

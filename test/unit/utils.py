@@ -8,7 +8,7 @@ from mapping.converter import (
 )
 
 
-def load_template_rc(file="test/unit/template-crate.json"):
+def load_template_rc(file="test/data/template-crate.json"):
     with open(file) as f:
         rc = json.load(f)
     return rc
