@@ -20,8 +20,7 @@ def doi(value):
     Checks if the value is a doi url
     """
     doi_start_pattern = r"https?:\/\/(dx.)?doi.org"
-    match = re.match(doi_start_pattern, value)
-    return value and match
+    return value and re.match(doi_start_pattern, value)
 
 
 def orcid(value):

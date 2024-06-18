@@ -111,12 +111,14 @@ def get_mapping_paths(rc, mappings):
     for i in array_values:
         mapping_paths[i] = get_paths(rc, i)
 
+    return mapping_paths
+
 
 def apply_mapping(mapping, mapping_paths, rc, dc):
     rule_applied = False
 
     if "_ignore" in mapping.keys():
-        return None, rule_applied
+        return dc, rule_applied
 
     from_mapping_value = mapping.get("from")
     to_mapping_value = mapping.get("to")
@@ -155,7 +157,7 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
         if only_if_value != None:
             print(f"\t\t|- Checking condition {only_if_value}")
             if not check_condition(only_if_value, from_value):
-                return None, rule_applied
+                return dc, rule_applied
 
         if processing_mapping_value:
             from_value = process(processing_mapping_value, from_value)
@@ -168,6 +170,7 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
                 f"\t\t|- Adding {from_value} to {to_mapping_value} with path {path.copy()}"
             )
             rule_applied = True
+            print(dc, to_mapping_value, from_value)
             dc = set_dc(dc, to_mapping_value, from_value, path.copy())
 
     return dc, rule_applied
