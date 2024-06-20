@@ -1,6 +1,8 @@
-import mapping.converter as converter
-import pytest
 import re
+
+import pytest
+
+import mapping.converter as converter
 
 
 def test_check_condition__true():

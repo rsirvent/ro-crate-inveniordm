@@ -1,10 +1,6 @@
-from test.unit.utils import (
-    add_entity_to_template,
-    load_template_rc,
-    set_field_in_template_rde,
-    get_single_mapping,
-    get_mapping_class,
-)
+from test.unit.utils import (add_entity_to_template, get_mapping_class,
+                             get_single_mapping, load_template_rc,
+                             set_field_in_template_rde)
 
 
 def test_load_template_rc():

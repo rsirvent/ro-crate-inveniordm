@@ -1,7 +1,9 @@
-import mapping.condition_functions as cf
+from datetime import datetime, timedelta
+
 import pytest
 import pytz
-from datetime import datetime, timedelta
+
+import mapping.condition_functions as cf
 
 
 def test_is_uri__true():

@@ -33,9 +33,10 @@ def embargoed(value):
     """
     Checks if the value is a date in the future.
     """
+    from datetime import datetime
+
     import pytz
     from dateutil.parser import parse
-    from datetime import datetime
 
     utc = pytz.UTC
 

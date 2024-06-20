@@ -6,12 +6,14 @@
     :author: Milan Szente
 """
 
-import sys
-import requests
-import credentials
 import json
 import os
+import sys
+
+import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+import credentials
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 

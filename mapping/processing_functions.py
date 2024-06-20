@@ -70,8 +70,9 @@ def embargoDateProcessing(value):
     """
     Parses the date and returns it in the format YYYY-MM-DD.
     """
-    from dateutil.parser import parse
     from datetime import datetime
+
+    from dateutil.parser import parse
 
     if value == None:
         return None

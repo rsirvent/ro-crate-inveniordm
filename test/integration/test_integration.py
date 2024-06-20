@@ -1,9 +1,10 @@
-import os
-import subprocess
-import shutil
 import json
-import pytest
+import os
 import re
+import shutil
+import subprocess
+
+import pytest
 import requests
 
 import credentials

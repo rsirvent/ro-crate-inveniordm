@@ -1,5 +1,6 @@
-import mapping.processing_functions as pf
 import pytest
+
+import mapping.processing_functions as pf
 
 
 def test_dateProcessing__date_only():
