@@ -1,8 +1,13 @@
+import re
+
+
 def is_uri(value):
+    """Checks if a string is a URI."""
     return value and value.startswith("http")
 
 
 def is_not_uri(value):
+    """Checks if a string is not empty and not a URI."""
     return value and not is_uri(value)
 
 
@@ -14,7 +19,10 @@ def doi(value):
     """
     Checks if the value is a doi url
     """
-    return value and value.startswith("https://doi.org/")
+    doi_start_pattern = r"https?:\/\/(dx.)?doi.org"
+    if not value:
+        return False
+    return re.match(doi_start_pattern, value) is not None
 
 
 def orcid(value):
@@ -25,13 +33,11 @@ def embargoed(value):
     """
     Checks if the value is a date in the future.
     """
-    import pytz
-    from dateutil.parser import parse
     from datetime import datetime
 
-    utc = pytz.UTC
+    from dateutil.parser import parse
 
-    if value == None:
+    if not value:
         return False
 
     fuzzy_date = parse(value, fuzzy=True)

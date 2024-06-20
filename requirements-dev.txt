@@ -1,0 +1,11 @@
+pytest
+pytest-cov
+black
+flake8
+mypy
+types-Pygments
+types-colorama
+types-python-dateutil
+types-pytz
+types-requests
+types-setuptools

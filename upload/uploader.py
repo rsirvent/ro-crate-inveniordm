@@ -6,14 +6,12 @@
     :author: Milan Szente
 """
 
-import sys
-import requests
-import credentials
 import json
 import os
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import sys
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+import requests
+import credentials
 
 api_url = credentials.repository_base_url
 
@@ -42,6 +40,7 @@ def deposit(metadata, files, publish=False):
     record_id = upload(metadata, files)
     if publish:
         publish_record(record_id)
+    return record_id
 
 
 def create_draft_record(metadata):
@@ -137,10 +136,14 @@ def upload(metadata, files):
     """
 
     record_id = create_draft_record(metadata)
+    print(f"Preparing to upload {len(files)} files...")
     start_draft_files_upload(record_id, files)
 
+    print(f"Uploading {len(files)} files...")
     for file in files:
         upload_file(record_id, file)
+
+    print(f"All {len(files)} files uploaded.")
     return record_id
 
 

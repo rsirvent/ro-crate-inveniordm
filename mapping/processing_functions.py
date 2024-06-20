@@ -1,8 +1,7 @@
 def dateProcessing(value):
     from dateutil.parser import parse
-    from datetime import datetime
 
-    if value == None:
+    if not value:
         return None
 
     if len(value) == 4:
@@ -10,9 +9,10 @@ def dateProcessing(value):
         return value
 
     fuzzy_date = parse(value, fuzzy=True)
-    return fuzzy_date and fuzzy_date.strftime("%Y-%m-%d")
-
-    return value
+    if not fuzzy_date:
+        print("Warning: Date {date} could not be parsed.")
+        return None
+    return fuzzy_date.strftime("%Y-%m-%d")
 
 
 def geonamesProcessing(value):
@@ -71,12 +71,14 @@ def embargoDateProcessing(value):
     Parses the date and returns it in the format YYYY-MM-DD.
     """
     from dateutil.parser import parse
-    from datetime import datetime
 
-    if value == None:
+    if value is None:
         return None
     fuzzy_date = parse(value, fuzzy=True)
-    return fuzzy_date and fuzzy_date.strftime("%Y-%m-%d")
+    if not fuzzy_date:
+        print("Warning: Date {date} could not be parsed.")
+        return None
+    return fuzzy_date.strftime("%Y-%m-%d")
 
 
 def convert_to_iso_639_3(value):
@@ -85,7 +87,7 @@ def convert_to_iso_639_3(value):
     """
     import iso639
 
-    if value == None:
+    if value is None:
         return None
     try:
         language = iso639.Language.match(value)

@@ -1,15 +1,15 @@
 """
     This script deposits a RO-Crate directory to an InvenioRDM repository.
-    
+
     :author: Philipp Beer
     :author: Milan Szente
 """
 
-import sys
-import os
-import json
-import glob
 import argparse
+import glob
+import json
+import os
+import sys
 
 import mapping.converter as converter
 import upload.uploader as uploader
@@ -71,7 +71,7 @@ def main():
 
     if not os.path.isfile(ro_crates_metadata_file):
         print(
-            f"'{ro_crates_dir}' is not a RO-Crate directory: 'ro-crate-matadata.json' not found."
+            f"'{ro_crates_dir}' is not a RO-Crate directory: 'ro-crate-metadata.json' not found."
         )
         sys.exit()
 
@@ -95,7 +95,9 @@ def main():
             data_cite_metadata = json.load(f)
 
     # Upload files
-    uploader.deposit(data_cite_metadata, all_files, publish=publish)
+    record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)
+
+    print(f"Successfully created record {record_id}")
 
 
 if __name__ == "__main__":
