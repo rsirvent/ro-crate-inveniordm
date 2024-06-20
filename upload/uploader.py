@@ -11,11 +11,7 @@ import os
 import sys
 
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
 import credentials
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 api_url = credentials.repository_base_url
 
