@@ -1,5 +1,3 @@
-import pytest
-
 import mapping.processing_functions as pf
 
 

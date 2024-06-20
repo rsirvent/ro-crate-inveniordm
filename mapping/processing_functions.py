@@ -70,11 +70,9 @@ def embargoDateProcessing(value):
     """
     Parses the date and returns it in the format YYYY-MM-DD.
     """
-    from datetime import datetime
-
     from dateutil.parser import parse
 
-    if value == None:
+    if value is None:
         return None
     fuzzy_date = parse(value, fuzzy=True)
     if not fuzzy_date:
@@ -89,7 +87,7 @@ def convert_to_iso_639_3(value):
     """
     import iso639
 
-    if value == None:
+    if value is None:
         return None
     try:
         language = iso639.Language.match(value)

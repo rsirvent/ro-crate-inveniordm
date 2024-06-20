@@ -69,7 +69,7 @@ def test_created_invenio_records(crate_name):
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {credentials.api_key}",
+        "Authorization": f"Bearer {api_key}",
     }
     record = requests.get(
         f"{api_url}/api/deposit/depositions/{record_id}",
@@ -100,4 +100,4 @@ def test_created_invenio_records(crate_name):
     else:
         assert len(record["files"]) == 0
     assert record["state"] == "unsubmitted"
-    assert record["submitted"] == False
+    assert record["submitted"] is False

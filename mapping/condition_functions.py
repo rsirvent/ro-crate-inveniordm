@@ -35,10 +35,7 @@ def embargoed(value):
     """
     from datetime import datetime
 
-    import pytz
     from dateutil.parser import parse
-
-    utc = pytz.UTC
 
     if not value:
         return False

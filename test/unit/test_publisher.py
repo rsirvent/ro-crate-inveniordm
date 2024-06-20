@@ -1,11 +1,13 @@
-import json
-from test.unit.utils import (add_entity_to_template, get_single_mapping,
-                             load_template_rc, set_field_in_template_rde)
+from test.unit.utils import (
+    add_entity_to_template,
+    get_single_mapping,
+    load_template_rc,
+    set_field_in_template_rde,
+)
 
 import pytest
 
-from mapping.converter import (apply_mapping, get_arrays_from_from_values,
-                               get_mapping_paths, rc_get_rde, setup_dc)
+from mapping.converter import apply_mapping, get_mapping_paths, setup_dc
 
 publisher_string = "Test University"
 publisher_entity = {

@@ -85,7 +85,7 @@ def convert(rc, metadata_only=False):
 
         if not is_any_present:
             none_present_value = root_mappings.get("ifNonePresent")
-            if none_present_value != None:
+            if none_present_value is not None:
                 print(f"\t|- Applying ifNonePresent rule {none_present_value}")
                 for none_present_key in none_present_value:
                     none_present_mapping_value = none_present_value.get(
@@ -102,7 +102,7 @@ def get_mapping_paths(rc, mappings):
     for key in mappings:
         mapping = mappings.get(key)
         from_value = mapping.get("from")
-        if from_value != None:
+        if from_value is not None:
             all_from_values.append(from_value)
 
     array_values = get_arrays_from_from_values(all_from_values)
@@ -152,10 +152,10 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
         new_path = path.copy()
         from_value = get_rc(rc.copy(), from_mapping_value, new_path)
 
-        # if (from_value == None):
+        # if (from_value is None):
         #    continue
 
-        if only_if_value != None:
+        if only_if_value is not None:
             print(f"\t\t|- Checking condition {only_if_value}")
             if not check_condition(only_if_value, from_value):
                 return dc, rule_applied
@@ -166,7 +166,7 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
         if value_mapping_value:
             from_value = transform_to_target_format(value_mapping_value, from_value)
 
-        if from_value != None:
+        if from_value is not None:
             print(
                 f"\t\t|- Adding {from_value} to {to_mapping_value} with path {path.copy()}"
             )
@@ -204,7 +204,7 @@ def get_paths_recursive(rc, temp, keys, paths, path):
     # clean key
     cleaned_key = current_key
     cleaned_key = cleaned_key.replace("[]", "").replace("$", "")
-    if temp == None:
+    if temp is None:
         return
     if cleaned_key not in temp.keys():
         return
@@ -306,12 +306,12 @@ def transform_to_target_format(format, value):
     :param value: The value to format.
     :return: The formatted value.
     """
-    if format != None:
+    if format is not None:
         if value:
             print(f"\t\t|- Formatting value {value} according to {format}.")
             format = format_value(format, value)
             return format
-        elif value == None and contains_atatthis(format):
+        elif value is None and contains_atatthis(format):
             format = None
             return format
         print(f"\t\t|- Formatted value {value} is {format}")
@@ -330,47 +330,49 @@ def get_rc(rc, from_key, path=[]):
     """
     result = None
 
-    if from_key:
-        print(f"\t\t|- Retrieving value {from_key} with path {path} from RO-Crate.")
-        keys = from_key.split(".")
-        print(keys)
-        temp = rc_get_rde(rc)
+    if not from_key:
+        return None
 
-        for key in keys:
-            cleaned_key = key.replace("[]", "").replace("$", "")
-            print(f"\t\t|- Cleaned key: {cleaned_key}")
-            if key.startswith("$"):
-                # we need to dereference the key
-                index = None
-                if key.endswith("[]"):
-                    index = path[0]
-                    path = path[1:]
-                    if index == -1:
-                        temp = get_rc_ref(rc, temp, "$" + cleaned_key)
-                    else:
-                        temp = get_rc_ref(rc, temp, "$" + cleaned_key, index)
-                else:
+    print(f"\t\t|- Retrieving value {from_key} with path {path} from RO-Crate.")
+    keys = from_key.split(".")
+    print(keys)
+    temp = rc_get_rde(rc)
+
+    for key in keys:
+        cleaned_key = key.replace("[]", "").replace("$", "")
+        print(f"\t\t|- Cleaned key: {cleaned_key}")
+        if key.startswith("$"):
+            # we need to dereference the key
+            index = None
+            if key.endswith("[]"):
+                index = path[0]
+                path = path[1:]
+                if index == -1:
                     temp = get_rc_ref(rc, temp, "$" + cleaned_key)
+                else:
+                    temp = get_rc_ref(rc, temp, "$" + cleaned_key, index)
+            else:
+                temp = get_rc_ref(rc, temp, "$" + cleaned_key)
 
-                if temp == None:
-                    return None
-
-            elif cleaned_key not in temp.keys():
-                # The key could not be found in the RO-Crate
+            if temp is None:
                 return None
 
-            else:
-                if key.endswith("[]"):
-                    index = path[0]
-                    path = path[1:]
-                    if index == -1:
-                        temp = temp.get(cleaned_key)
-                    else:
-                        temp = temp.get(cleaned_key)[index]
-                else:
-                    temp = temp.get(cleaned_key)
+        elif cleaned_key not in temp.keys():
+            # The key could not be found in the RO-Crate
+            return None
 
-        result = temp
+        else:
+            if key.endswith("[]"):
+                index = path[0]
+                path = path[1:]
+                if index == -1:
+                    temp = temp.get(cleaned_key)
+                else:
+                    temp = temp.get(cleaned_key)[index]
+            else:
+                temp = temp.get(cleaned_key)
+
+    result = temp
 
     print(f"\t\t|- Value for key {from_key} is {result}")
 
@@ -449,7 +451,7 @@ def get_rc_ref_root(rc, from_key):
 
     keys = from_key.split(".")
     root = rc_get_rde(rc)
-    if root.get(keys[0][1:]) == None:
+    if root.get(keys[0][1:]) is None:
         print(f"\t\t|- Key {keys[0]} not found in RO-Crate.")
         return None
     target_entity_id = root.get(keys[0][1:]).get("@id")
@@ -528,7 +530,7 @@ def set_dc(dictionary, key, value=None, path=[]):
 
             current_dict = current_dict[key_part[:-2]][index]
 
-        elif not key_part in current_dict and not key_part.endswith("[]"):
+        elif key_part not in current_dict and not key_part.endswith("[]"):
             last_val = current_dict
             current_dict[key_part] = {}
             current_dict = current_dict[key_part]

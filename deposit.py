@@ -1,15 +1,15 @@
 """
     This script deposits a RO-Crate directory to an InvenioRDM repository.
-    
+
     :author: Philipp Beer
     :author: Milan Szente
 """
 
-import sys
-import os
-import json
-import glob
 import argparse
+import glob
+import json
+import os
+import sys
 
 import mapping.converter as converter
 import upload.uploader as uploader
