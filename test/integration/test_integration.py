@@ -6,7 +6,6 @@ import subprocess
 
 import pytest
 import requests
-
 import credentials
 
 CRATES = ["minimal-ro-crate", "test-ro-crate", "real-world-example"]

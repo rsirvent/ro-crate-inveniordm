@@ -30,9 +30,12 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+    - name: Set up credentials
+      run: |
+        cp credentials.template.py credentials.py
     - name: Lint with mypy
       run: |
         mypy . --ignore-missing-imports
     - name: Test with pytest
       run: |
-        pytest
+        pytest -k "not integration"
