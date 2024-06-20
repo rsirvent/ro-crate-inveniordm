@@ -71,7 +71,7 @@ def main():
 
     if not os.path.isfile(ro_crates_metadata_file):
         print(
-            f"'{ro_crates_dir}' is not a RO-Crate directory: 'ro-crate-matadata.json' not found."
+            f"'{ro_crates_dir}' is not a RO-Crate directory: 'ro-crate-metadata.json' not found."
         )
         sys.exit()
 
