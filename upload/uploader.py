@@ -42,6 +42,7 @@ def deposit(metadata, files, publish=False):
     record_id = upload(metadata, files)
     if publish:
         publish_record(record_id)
+    return record_id
 
 
 def create_draft_record(metadata):
@@ -137,10 +138,14 @@ def upload(metadata, files):
     """
 
     record_id = create_draft_record(metadata)
+    print(f"Preparing to upload {len(files)} files...")
     start_draft_files_upload(record_id, files)
 
+    print(f"Uploading {len(files)} files...")
     for file in files:
         upload_file(record_id, file)
+
+    print(f"All {len(files)} files uploaded.")
     return record_id
 
 

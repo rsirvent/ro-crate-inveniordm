@@ -95,7 +95,9 @@ def main():
             data_cite_metadata = json.load(f)
 
     # Upload files
-    uploader.deposit(data_cite_metadata, all_files, publish=publish)
+    record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)
+
+    print(f"Successfully created record {record_id}")
 
 
 if __name__ == "__main__":
