@@ -67,7 +67,7 @@ def main():
     crate_dir = args.ro_crate_directory
     datacite_list = args.datacite
     no_upload = args.no_upload
-    omit_roc_files = args.omit_roc_iles
+    omit_roc_files = args.omit_roc_files
     publish = args.publish
     zip = args.zip
 
@@ -112,12 +112,10 @@ def deposit(
 
     metadata_only = True
     for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
-        if "ro-crate-preview" in file or "ro-crate-metadata.json" in file:
-            if omit_roc_files:
-                continue
-        else:
-            metadata_only = False
-
+        if omit_roc_files and (
+            "ro-crate-preview" in file or "ro-crate-metadata.json" in file
+        ):
+            continue
         if os.path.isfile(file):
             all_files.append(file)
 
@@ -137,6 +135,11 @@ def deposit(
         # convert the RO-Crate metadata to DataCite
         with open(ro_crate_metadata_file, "r") as f:
             ro_crate_metadata = json.load(f)
+
+        # if no files to upload, just set the metadata on the record
+        metadata_only = False
+        if len(all_files) == 0:
+            metadata_only = True
 
         # Convert Metadata
         data_cite_metadata = converter.convert(
