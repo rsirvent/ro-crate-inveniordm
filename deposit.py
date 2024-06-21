@@ -26,58 +26,104 @@ def main():
 
     parser.add_argument(
         "ro_crate_directory",
-        help="RO-Crate directory to upload.",
+        help="Path to the RO-Crate directory to upload",
         type=str,
         action="store",
     )
     parser.add_argument(
         "-d",
         "--datacite",
-        help="Optional DataCite metadata file. Skips the conversion process.",
+        help="Path to a DataCite metadata file to use for the upload. Skips the conversion process from RO-Crate metadata to DataCite",
         type=str,
         action="store",
         nargs=1,
     )
     parser.add_argument(
+        "--no-upload",
+        help="Stop before creating InvenioRDM record and do not upload files. Use this option to create a DataCite metadata file for manual review",
+        action="store_true",
+    )
+    # included for backwards compatibility
+    parser.add_argument(
+        "-o",
+        "--omit-roc-files",
+        help="Omit ro-crate-metadata.json and ro-crate-preview files from the upload (not recommended)",
+        action="store_true",
+    )
+    parser.add_argument(
         "-p",
         "--publish",
-        help="Publish the record after uploading.",
+        help="Publish the record after uploading",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-z",
+        "--zip",
+        help="Instead of uploading all the files within the crate, create and upload a single zip file containing the whole crate",
         action="store_true",
     )
     args = parser.parse_args()
 
     crate_dir = args.ro_crate_directory
     datacite_list = args.datacite
+    no_upload = args.no_upload
+    omit_roc_files = args.omit_roc_iles
     publish = args.publish
+    zip = args.zip
 
     datacite_file = datacite_list[0] if datacite_list else None
 
-    deposit(ro_crate_dir=crate_dir, publish=publish, datacite_file=datacite_file)
+    deposit(
+        ro_crate_dir=crate_dir,
+        datacite_file=datacite_file,
+        no_upload=no_upload,
+        omit_roc_files=omit_roc_files,
+        publish=publish,
+        zip=zip,
+    )
 
 
 def deposit(
     ro_crate_dir: str,
-    publish: bool = False,
     datacite_file: str | None = None,
+    no_upload: bool = False,
+    omit_roc_files: bool = False,
+    publish: bool = False,
+    zip: bool = False,
 ):
     """
     The main function of the script.
     It takes a RO-Crate directory as input and uploads it to an InvenioRDM repository.
+
+    TODO: implement what the zip argument says it will do!
+
+    :param ro_crate_dir: Path to the RO-Crate directory to upload.
+    :param datacite_file: Path to a DataCite metadata file which should be used for the upload. Skips the conversion process from RO-Crate metadata to DataCite. Defaults to None
+    :param no_upload: Stop before creating InvenioRDM record and do not upload files. Use this option to create a DataCite metadata file for manual review. Defaults to False
+    :param omit_roc_files: Omit ro-crate-metadata.json and ro-crate-preview files from the upload (not recommended). Defaults to False
+    :param publish: Publish the record after uploading. Defaults to False
+    :param zip: Instead of uploading all the files within the crate, create and upload a single zip file containing the whole crate. Defaults to False
+    :return: The ID of the created record, or None if no record was created.
     """
 
     # Get all files in RO-Crate directory and check if it is a RO-Crate directory
     # Exclude RO-Crate metadata, and RO-Crate website files
     all_files = []
 
+    metadata_only = True
     for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
         if "ro-crate-preview" in file or "ro-crate-metadata.json" in file:
-            continue
+            if omit_roc_files:
+                continue
+        else:
+            metadata_only = False
+
         if os.path.isfile(file):
             all_files.append(file)
 
-    ro_crates_metadata_file = os.path.join(ro_crate_dir, "ro-crate-metadata.json")
+    ro_crate_metadata_file = os.path.join(ro_crate_dir, "ro-crate-metadata.json")
 
-    if not os.path.isfile(ro_crates_metadata_file):
+    if not os.path.isfile(ro_crate_metadata_file):
         print(
             f"'{ro_crate_dir}' is not a RO-Crate directory: 'ro-crate-metadata.json' not found."
         )
@@ -89,12 +135,8 @@ def deposit(
             data_cite_metadata = json.load(f)
     else:
         # convert the RO-Crate metadata to DataCite
-        with open(ro_crates_metadata_file, "r") as f:
+        with open(ro_crate_metadata_file, "r") as f:
             ro_crate_metadata = json.load(f)
-
-        metadata_only = False
-        if len(all_files) == 0:
-            metadata_only = True
 
         # Convert Metadata
         data_cite_metadata = converter.convert(
@@ -104,11 +146,15 @@ def deposit(
         with open("datacite-out.json", "w") as f:
             json.dump(data_cite_metadata, f, indent=4)
 
-    # Upload files
-    record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)
+    # Upload and publish files, depending on no_upload and publish options
+    if no_upload:
+        print(f"Created datacite-out.json, skipping upload.")
+        return None
+    else:
+        record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)
 
-    print(f"Successfully created record {record_id}")
-    return record_id
+        print(f"Successfully created record {record_id}")
+        return record_id
 
 
 if __name__ == "__main__":
