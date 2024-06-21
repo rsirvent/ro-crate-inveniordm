@@ -104,7 +104,7 @@ def test_created_invenio_records(crate_name):
     assert record["submitted"] is False
 
 
-def test_created_invenio_record_from_datacite():
+def test_cli__datacite():
     """Test creating a record from a pre-existing DataCite file."""
     # Arrange
     crate_name = "test-ro-crate"
@@ -134,3 +134,54 @@ def test_created_invenio_record_from_datacite():
     # check submission state
     assert record["state"] == "unsubmitted"
     assert record["submitted"] is False
+
+
+def test_cli__omit_roc_files():
+    """Test creating a record with omit_roc_files option."""
+    # Arrange
+    crate_name = "test-ro-crate"
+    crate_path = os.path.join(TEST_DATA_FOLDER, crate_name)
+    expected_log_pattern = r"^Successfully created record (?P<id>[0-9]*)$"
+
+    # Act
+    # note - check_output raises CalledProcessError if exit code is non-zero
+    log = subprocess.check_output(
+        f"python deposit.py {crate_path} -o", shell=True, text=True
+    )
+    match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
+    record_id = match.group("id")
+
+    record = fetch_inveniordm_record(record_id)
+
+    # Assert
+    for file in record["files"]:
+        filename = file["filename"]
+        assert filename != "ro-crate-metadata.json"
+        local_path = next(
+            pathlib.Path(os.path.join(TEST_DATA_FOLDER, crate_name)).glob(
+                f"**/{filename}"
+            )
+        )
+        assert "ro-crate-preview" not in str(local_path.relative_to(crate_path))
+
+
+def test_cli__publish():
+    """Test creating a record with publish option."""
+    # Arrange
+    crate_name = "test-ro-crate"
+    crate_path = os.path.join(TEST_DATA_FOLDER, crate_name)
+    expected_log_pattern = r"^Successfully created record (?P<id>[0-9]*)$"
+
+    # Act
+    # note - check_output raises CalledProcessError if exit code is non-zero
+    log = subprocess.check_output(
+        f"python deposit.py {crate_path} -p", shell=True, text=True
+    )
+    match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
+    record_id = match.group("id")
+
+    record = fetch_inveniordm_record(record_id)
+
+    # Assert
+    assert record["state"] == "done"
+    assert record["submitted"] is True

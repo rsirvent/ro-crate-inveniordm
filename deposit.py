@@ -47,7 +47,7 @@ def main():
     parser.add_argument(
         "-o",
         "--omit-roc-files",
-        help="Omit ro-crate-metadata.json and ro-crate-preview files from the upload (not recommended)",
+        help="Omit files named 'ro-crate-metadata.json' and directories/files containing 'ro-crate-preview' from the upload (not recommended)",
         action="store_true",
     )
     parser.add_argument(
@@ -100,7 +100,7 @@ def deposit(
     :param ro_crate_dir: Path to the RO-Crate directory to upload.
     :param datacite_file: Path to a DataCite metadata file which should be used for the upload. Skips the conversion process from RO-Crate metadata to DataCite. Defaults to None
     :param no_upload: Stop before creating InvenioRDM record and do not upload files. Use this option to create a DataCite metadata file for manual review. Defaults to False
-    :param omit_roc_files: Omit ro-crate-metadata.json and ro-crate-preview files from the upload (not recommended). Defaults to False
+    :param omit_roc_files: Omit files named 'ro-crate-metadata.json' and directories/files containing 'ro-crate-preview' from the upload (not recommended). Defaults to False
     :param publish: Publish the record after uploading. Defaults to False
     :param zip: Instead of uploading all the files within the crate, create and upload a single zip file containing the whole crate. Defaults to False
     :return: The ID of the created record, or None if no record was created.
