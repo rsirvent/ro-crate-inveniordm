@@ -22,11 +22,14 @@ Command line tool to deposit a [RO-Crate directory](https://www.researchobject.o
 ![Screenshot of token creation page on TU Wien instance](./images/researchdata.png)
 
 ### Set up the environmental variables
-1. copy and rename `credentials.template.py` to `credentials.py` in the same folder
-1. open `credentials.py` with a text editor and fill in your API key in the `api_key` variable
-1. fill in the InvenioRDM base URL in the `repository_base_url` variable
+1. copy and rename `.env.template` to `.env` in the same folder
+1. open `.env` with a text editor and fill in your API key in the `INVENIORDM_API_KEY` variable
+1. fill in the InvenioRDM base URL in the `INVENIORDM_BASE_URL` variable
   - in case of Zenodo Sandbox: use `https://sandbox.zenodo.org/`
   - in case of TU Wien test instance: use `https://test.researchdata.tuwien.ac.at/`
+1. Run `source .env` to set the environment variables for the session
+
+If you prefer to set the environment variables `INVENIORDM_API_KEY` and `INVENIORDM_BASE_URL` another way (e.g. in `~/.bashrc`), you can do that instead.
 
 ### Set up the Python environment
 Run `python3 -m pip install -r requirements.txt`
@@ -40,7 +43,7 @@ Run `python3 deposit.py <ro-crate-dir>` with `<ro-crate-dir>` being the path to 
 Run the same command with the `-p` option to publish the record.
 
 Run `python3 deposit.py -h` for help.
-
+.
 ### Manually verifying DataCite conversion before upload
 
 This tool is a *best-effort* approach. After converting the metadata file, the resulting DataCite file is stored as `datacite-out.json` in the root directory. Users can adjust the generated DataCite file as needed, and can run the program in two stages to facilitate this:
@@ -88,7 +91,7 @@ The project consists of the following structure:
 - `/upload`: Contains code for the upload process
   - `uploader.py`: Python script used to upload the files to the InvenioRDM. Not to be called by the user.
 - `deposit.py`: Starting point. Used to map and upload the RO-Crate directory.
-- `credentials.template.py`: Template file for the environment variables.
+- `.env.template`: Template file for the environment variables.
 - `/test`: contains tests and test data
 
 ## Mapping
