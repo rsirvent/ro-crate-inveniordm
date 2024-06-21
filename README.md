@@ -8,32 +8,73 @@ Command line tool to deposit a [RO-Crate directory](https://www.researchobject.o
 
 - [`Python 3.x`](https://www.python.org/downloads/)
 
+## Setup
+
+### Create an InvenioRDM API token
+1. Register for an account on your chosen InvenioRDM instance. [Zenodo Sandbox](https://sandbox.zenodo.org/) can be used for testing.
+1. Go to your profile and select Applications.
+1. You should see a section called "Personal access tokens." Click the "New token" button.
+1. Give the token a name that reminds you of what you're using it for (e.g. RO-Crate upload token)
+1. Select the scopes deposit:write and deposit:actions.
+1. Click "Create."
+1. Copy the access token and continue with the next stage.
+
+![Screenshot of token creation page on TU Wien instance](./images/researchdata.png)
+
+### Set up the environmental variables
+1. copy and rename `credentials.template.py` to `credentials.py` in the same folder
+1. open `credentials.py` with a text editor and fill in your API key in the `api_key` variable
+1. fill in the InvenioRDM base URL in the `repository_base_url` variable
+  - in case of Zenodo Sandbox: use `https://sandbox.zenodo.org/`
+  - in case of TU Wien test instance: use `https://test.researchdata.tuwien.ac.at/`
+
+### Set up the Python environment
+Run `python3 -m pip install -r requirements.txt`
+
 ## Usage
 
-- Create an InvenioRDM API token
-  - go to `<base_url>/account/settings/applications/tokens/new/`
-  - in case of TU Wien, go to: [https://test.researchdata.tuwien.ac.at/account/settings/applications/tokens/new/](https://test.researchdata.tuwien.ac.at/account/settings/applications/tokens/new/)
+### General usage
 
-![](./images/researchdata.png)
+Run `python3 deposit.py <ro-crate-dir>` with `<ro-crate-dir>` being the path to the RO-Crate directory. The record is saved as a draft and not published.
+
+Run the same command with the `-p` option to publish the record.
+
+Run `python3 deposit.py -h` for help.
+
+### Manually verifying DataCite conversion before upload
+
+This tool is a *best-effort* approach. After converting the metadata file, the resulting DataCite file is stored as `datacite-out.json` in the root directory. Users can adjust the generated DataCite file as needed, and can run the program in two stages to facilitate this:
+
+First, run the program with the `--no-upload` option, to create the DataCite file without uploading anything to InvenioRDM:
+
+`python3 deposit.py --no-upload <ro-crate-dir>`.
+
+After verifying and adjusting the DataCite file, use the `-d` option to tell the program to use this file for upload and skip the process of conversion:
+
+`python3 deposit.py -d <datacite-file> <ro-crate-dir>`.
 
 
-- Set up the environmental variables
-  - copy and rename `credentials.template.py` to `credentials.py` in the same folder
-  - open `credentials.py` with a text editor and fill in your API key in the `api_key` variable
-  - fill in the InvenioRDM base URL in the `repository_base_url` variable
-    - in case of TU Wien: use `https://test.researchdata.tuwien.ac.at/`
+### Further options
 
+```
+usage: deposit.py [-h] [-d DATACITE] [--no-upload] [-o] [-p] [-z] ro_crate_directory
 
-- Set up the Python environment
-  - Run `python3 -m pip install -r requirements.txt`
+Takes a RO-Crate directory as input and uploads it to an InvenioRDM repository
 
-- Upload the RO-Crate directory
-  - Run `python3 deposit.py <ro-crate-dir>` with the RO-Crate directory as parameter. The record is saved as a draft and not published
-  - Run `python3 deposit.py -p <ro-crate-dir>` with the RO-Crate directory as parameter to publish the record.
-  - Run `python3 deposit.py -h` for help.
+positional arguments:
+  ro_crate_directory    Path to the RO-Crate directory to upload
 
-> **NOTE:** This tool is a *best-effort* approach. After converting the metadata file, the resulting DataCite file is stored as `datacite-out.json` in the root directory. Users can adjust the generated DataCite file as needed. To use the adjusted DataCite file for upload and skip the process of conversion, run the program as follows:\
- `python3 deposit.py -d <datacite-file> <ro-crate-dir>`.
+options:
+  -h, --help            show this help message and exit
+  -d DATACITE, --datacite DATACITE
+                        Path to a DataCite metadata file to use for the upload. Skips the conversion process from RO-Crate metadata to DataCite
+  --no-upload           Stop before creating InvenioRDM record and do not upload files. Use this option to create a DataCite metadata file for manual
+                        review
+  -o, --omit-roc-files  Omit files named 'ro-crate-metadata.json' and directories/files containing 'ro-crate-preview' from the upload (not
+                        recommended)
+  -p, --publish         Publish the record after uploading
+  -z, --zip             Instead of uploading all the files within the crate, create and upload a single zip file containing the whole crate
+```
 
 ## File structure
 
@@ -48,7 +89,7 @@ The project consists of the following structure:
   - `uploader.py`: Python script used to upload the files to the InvenioRDM. Not to be called by the user.
 - `deposit.py`: Starting point. Used to map and upload the RO-Crate directory.
 - `credentials.template.py`: Template file for the environment variables.
-- `/test`: contains test instances
+- `/test`: contains tests and test data
 
 ## Mapping
 
