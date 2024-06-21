@@ -41,6 +41,6 @@
         ]
     },
     "files": {
-        "enabled": false
+        "enabled": true
     }
 }
