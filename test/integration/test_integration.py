@@ -1,13 +1,13 @@
 import json
 import os
+import pytest
 import pathlib
 import re
+import requests
 import shutil
 import subprocess
 
-import pytest
-import requests
-import credentials
+from test.unit.utils import get_request_headers, fetch_inveniordm_record
 
 CRATES = ["minimal-ro-crate", "test-ro-crate", "real-world-example"]
 TEST_DATA_FOLDER = "test/data"
@@ -70,18 +70,8 @@ def test_created_invenio_records(crate_name):
     match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
     record_id = match.group("id")
 
-    # get the created record
-    api_url = credentials.repository_base_url
-    api_key = credentials.api_key
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}",
-    }
-    record = requests.get(
-        f"{api_url}/api/deposit/depositions/{record_id}",
-        headers=headers,
-    ).json()
+    headers = get_request_headers()
+    record = fetch_inveniordm_record(record_id)
     metadata = record["metadata"]
 
     # Assert
@@ -110,5 +100,37 @@ def test_created_invenio_records(crate_name):
                 assert local_file.read() == remote_file_data.decode()
     else:
         assert len(record["files"]) == 0
+    assert record["state"] == "unsubmitted"
+    assert record["submitted"] is False
+
+
+def test_created_invenio_record_from_datacite():
+    """Test creating a record from a pre-existing DataCite file."""
+    # Arrange
+    crate_name = "test-ro-crate"
+    crate_path = os.path.join(TEST_DATA_FOLDER, crate_name)
+    compare_path = os.path.join(TEST_DATA_FOLDER, f"datacite-out-{crate_name}.json")
+    with open(compare_path) as expected:
+        expected_json = json.load(expected)
+        expected_metadata = expected_json["metadata"]
+    expected_log_pattern_1 = "Skipping metadata conversion, loading DataCite file"
+    expected_log_pattern_2 = r"^Successfully created record (?P<id>[0-9]*)$"
+
+    # Act
+    # note - check_output raises CalledProcessError if exit code is non-zero
+    log = subprocess.check_output(
+        f"python deposit.py {crate_path} -d {compare_path}", shell=True, text=True
+    )
+    match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
+    record_id = match.group("id")
+
+    record = fetch_inveniordm_record(record_id)
+    metadata = record["metadata"]
+
+    # Assert
+    assert expected_log_pattern_1 in log
+    # check one piece of metadata to confirm it was uploaded
+    assert metadata["title"] == expected_metadata["title"]
+    # check submission state
     assert record["state"] == "unsubmitted"
     assert record["submitted"] is False

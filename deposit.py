@@ -129,6 +129,7 @@ def deposit(
 
     if datacite_file:
         # skip conversion and use the provided file
+        print(f"Skipping metadata conversion, loading DataCite file {datacite_file}")
         with open(datacite_file, "r") as f:
             data_cite_metadata = json.load(f)
     else:
