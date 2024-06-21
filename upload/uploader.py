@@ -11,20 +11,20 @@ import os
 import sys
 
 import requests
-import credentials
+import upload.credentials as credentials
 
-api_url = credentials.repository_base_url
+api_url = credentials.get_repository_base_url()
 
 headers = {
     "Accept": "application/json",
     "Content-Type": "application/json",
-    "Authorization": f"Bearer {credentials.api_key}",
+    "Authorization": f"Bearer {credentials.get_api_key()}",
 }
 
 headers_stream = {
     "Accept": "application/json",
     "Content-Type": "application/octet-stream",
-    "Authorization": f"Bearer {credentials.api_key}",
+    "Authorization": f"Bearer {credentials.get_api_key()}",
 }
 
 

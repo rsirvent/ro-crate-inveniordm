@@ -7,8 +7,8 @@ mapping/__pycache__
 */__pycache__/
 .idea
 
-# credentials
-credentials.py
+# legacy – credentials in root directory
+/credentials.py
 
 # test outputs
 test/output
