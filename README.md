@@ -43,7 +43,7 @@ Run `python3 deposit.py <ro-crate-dir>` with `<ro-crate-dir>` being the path to 
 Run the same command with the `-p` option to publish the record.
 
 Run `python3 deposit.py -h` for help.
-.
+
 ### Manually verifying DataCite conversion before upload
 
 This tool is a *best-effort* approach. After converting the metadata file, the resulting DataCite file is stored as `datacite-out.json` in the root directory. Users can adjust the generated DataCite file as needed, and can run the program in two stages to facilitate this:
