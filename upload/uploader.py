@@ -11,20 +11,20 @@ import os
 import sys
 
 import requests
-import credentials
+import upload.credentials as credentials
 
-api_url = credentials.repository_base_url
+api_url = credentials.get_repository_base_url()
 
 headers = {
     "Accept": "application/json",
     "Content-Type": "application/json",
-    "Authorization": f"Bearer {credentials.api_key}",
+    "Authorization": f"Bearer {credentials.get_api_key()}",
 }
 
 headers_stream = {
     "Accept": "application/json",
     "Content-Type": "application/octet-stream",
-    "Authorization": f"Bearer {credentials.api_key}",
+    "Authorization": f"Bearer {credentials.get_api_key()}",
 }
 
 
@@ -56,7 +56,6 @@ def create_draft_record(metadata):
         f"{api_url}/api/records",
         data=json.dumps(metadata),
         headers=headers,
-        verify=False,
     )
 
     if resp.status_code != 201:
@@ -83,7 +82,6 @@ def start_draft_files_upload(record_id, files):
         f"{api_url}/api/records/{record_id}/draft/files",
         data=json.dumps(payload),
         headers=headers,
-        verify=False,
     )
     if resp.status_code != 201:
         print(f"Could not initiate file upload: {resp.status_code} {resp.text}")
@@ -108,7 +106,6 @@ def upload_file(record_id, file_path):
             f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content",
             data=f,
             headers=headers_stream,
-            verify=False,
         )
         if resp.status_code != 200:
             print(f"Could not upload file content: {resp.status_code} {resp.text}")
@@ -118,7 +115,6 @@ def upload_file(record_id, file_path):
     resp = requests.post(
         f"{api_url}/api/records/{record_id}/draft/files/{file_name}/commit",
         headers=headers,
-        verify=False,
     )
     if resp.status_code != 200:
         print(f"Could not commit file upload: {resp.status_code} {resp.text}")
@@ -157,7 +153,6 @@ def publish_record(record_id):
     resp = requests.post(
         f"{api_url}/api/records/{record_id}/draft/actions/publish",
         headers=headers,
-        verify=False,
     )
     if resp.status_code != 202:
         print(f"Could not publish record: {resp.status_code} {resp.text}")

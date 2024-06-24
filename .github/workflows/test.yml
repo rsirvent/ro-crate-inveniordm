@@ -32,10 +32,18 @@ jobs:
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
     - name: Set up credentials
       run: |
-        cp credentials.template.py credentials.py
+        echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
+        echo "INVENIORDM_API_KEY=\"$ZENODO_SANDBOX_API_KEY\"" >> .env
+      shell: bash
+      env:
+        ZENODO_SANDBOX_API_KEY : ${{secrets.ZENODO_SANDBOX_API_KEY}}
     - name: Lint with mypy
       run: |
         mypy . --ignore-missing-imports
     - name: Test with pytest
       run: |
-        pytest -k "not integration"
+        pytest
+    - uses: actions/upload-artifact@v4
+      with:
+        name: test-outputs-${{ matrix.os }}-python${{ matrix.python-version }}
+        path: test/output/

@@ -1,6 +1,7 @@
-import credentials
 import json
 import requests
+
+import upload.credentials as credentials
 
 
 def load_template_rc(file="test/data/template-crate.json"):
@@ -49,7 +50,7 @@ def get_mapping_class(mapping_class, mapping_file_name="mapping/mapping.json"):
 
 
 def get_request_headers():
-    api_key = credentials.api_key
+    api_key = credentials.get_api_key()
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -59,7 +60,7 @@ def get_request_headers():
 
 
 def fetch_inveniordm_record(record_id):
-    api_url = credentials.repository_base_url
+    api_url = credentials.get_repository_base_url()
     r = requests.get(
         f"{api_url}/api/deposit/depositions/{record_id}",
         headers=get_request_headers(),

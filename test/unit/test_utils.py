@@ -1,4 +1,3 @@
-import credentials
 import os
 import pytest
 from requests.exceptions import HTTPError
@@ -13,6 +12,7 @@ from test.unit.utils import (
     load_template_rc,
     set_field_in_template_rde,
 )
+import upload.credentials as credentials
 
 TEST_DATA_FOLDER = "test/data"
 TEST_OUTPUT_FOLDER = "test/output"
@@ -80,7 +80,7 @@ def test_get_request_headers():
     expected_headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {credentials.api_key}",
+        "Authorization": f"Bearer {credentials.get_api_key()}",
     }
 
     headers = get_request_headers()

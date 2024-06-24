@@ -14,6 +14,12 @@ TEST_DATA_FOLDER = "test/data"
 TEST_OUTPUT_FOLDER = "test/output"
 
 
+@pytest.fixture(scope="module", autouse=True)
+def create_output_dir():
+    """Creates folder for test outputs."""
+    return os.makedirs(TEST_OUTPUT_FOLDER, exist_ok=True)
+
+
 @pytest.mark.parametrize("crate_name", [*CRATES])
 def test_created_datacite_files(crate_name):
     # Arrange

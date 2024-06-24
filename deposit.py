@@ -112,7 +112,6 @@ def deposit(
     # Exclude RO-Crate metadata, and RO-Crate website files
     all_files = []
 
-    metadata_only = True
     for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
         if omit_roc_files and (
             "ro-crate-preview" in file or "ro-crate-metadata.json" in file

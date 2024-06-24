@@ -1,5 +1,6 @@
 pytest
 pytest-cov
+pytest-dotenv
 black
 flake8
 mypy
