@@ -28,7 +28,7 @@ headers_stream = {
 }
 
 
-def deposit(metadata, files, publish=False):
+def deposit(metadata, files, publish=False, zip=False):
     """
     Entry point.
     Uploads and publishes a record to the repository.
@@ -37,7 +37,7 @@ def deposit(metadata, files, publish=False):
     :param files: The record's files.
     :param publish: Whether to publish the record after uploading.
     """
-    record_id = upload(metadata, files)
+    record_id = upload(metadata, files, zip)
     if publish:
         publish_record(record_id)
     return record_id
@@ -89,7 +89,7 @@ def start_draft_files_upload(record_id, files):
     return
 
 
-def upload_file(record_id, file_path):
+def upload_file(record_id, file_path, zip):
     """
     Uploads a file to the record.
     Exits the program if the request fails.
@@ -101,15 +101,26 @@ def upload_file(record_id, file_path):
     print(file_name)
 
     # Upload file content
-    with open(file_path, "r") as f:
-        resp = requests.put(
-            f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content",
-            data=f,
-            headers=headers_stream,
-        )
-        if resp.status_code != 200:
-            print(f"Could not upload file content: {resp.status_code} {resp.text}")
-            sys.exit(1)
+    if zip:
+        with open(file_path, "rb") as f:
+            resp = requests.put(
+                f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content",
+                data=f,
+                headers=headers_stream,
+            )
+            if resp.status_code != 200:
+                print(f"Could not upload file content: {resp.status_code} {resp.text}")
+                sys.exit(1)
+    else:
+        with open(file_path, "r") as f:
+            resp = requests.put(
+                f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content",
+                data=f,
+                headers=headers_stream,
+            )
+            if resp.status_code != 200:
+                print(f"Could not upload file content: {resp.status_code} {resp.text}")
+                sys.exit(1)
 
     # Complete draft file upload
     resp = requests.post(
@@ -121,7 +132,7 @@ def upload_file(record_id, file_path):
         sys.exit(1)
 
 
-def upload(metadata, files):
+def upload(metadata, files, zip=False):
     """
     Uploads a draft record to the repository.
     Exits the program if the request fails.
@@ -137,7 +148,7 @@ def upload(metadata, files):
 
     print(f"Uploading {len(files)} files...")
     for file in files:
-        upload_file(record_id, file)
+        upload_file(record_id, file, zip)
 
     print(f"All {len(files)} files uploaded.")
     return record_id

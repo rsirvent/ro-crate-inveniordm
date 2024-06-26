@@ -11,6 +11,7 @@ import argparse
 import glob
 import json
 import os
+import shutil
 import sys
 
 import mapping.converter as converter
@@ -112,13 +113,23 @@ def deposit(
     # Exclude RO-Crate metadata, and RO-Crate website files
     all_files = []
 
-    for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
-        if omit_roc_files and (
-            "ro-crate-preview" in file or "ro-crate-metadata.json" in file
-        ):
-            continue
-        if os.path.isfile(file):
-            all_files.append(file)
+    if zip:
+        print("Creating zipped crate")
+        name = os.path.basename(ro_crate_dir.strip("/"))
+        crate_zip_path = shutil.make_archive(
+            os.path.join("zips", name),
+            "zip",
+            root_dir=ro_crate_dir,
+        )
+        all_files.append(crate_zip_path)
+    else:
+        for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
+            if omit_roc_files and (
+                "ro-crate-preview" in file or "ro-crate-metadata.json" in file
+            ):
+                continue
+            if os.path.isfile(file):
+                all_files.append(file)
 
     ro_crate_metadata_file = os.path.join(ro_crate_dir, "ro-crate-metadata.json")
 
@@ -156,7 +167,9 @@ def deposit(
         print(f"Created datacite-out.json, skipping upload.")
         return None
     else:
-        record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)
+        record_id = uploader.deposit(
+            data_cite_metadata, all_files, publish=publish, zip=zip
+        )
 
         print(f"Successfully created record {record_id}")
         return record_id

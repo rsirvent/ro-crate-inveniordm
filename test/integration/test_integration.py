@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 import pytest
 import pathlib
@@ -108,6 +109,44 @@ def test_created_invenio_records(crate_name):
         assert len(record["files"]) == 0
     assert record["state"] == "unsubmitted"
     assert record["submitted"] is False
+
+
+def test_cli__zip():
+    """Test uploading RO-Crate as a single zip file."""
+    # Arrange
+    crate_name = "test-ro-crate"
+    crate_path = os.path.join(TEST_DATA_FOLDER, crate_name)
+    compare_path = os.path.join(TEST_DATA_FOLDER, f"datacite-out-{crate_name}.json")
+    with open(compare_path) as expected:
+        expected_json = json.load(expected)
+        expected_metadata = expected_json["metadata"]
+    expected_log_pattern_1 = "Creating zipped crate"
+    expected_log_pattern_2 = r"^Successfully created record (?P<id>[0-9]*)$"
+
+    # Act
+    # note - check_output raises CalledProcessError if exit code is non-zero
+    log = subprocess.check_output(
+        f"python deposit.py {crate_path} -z", shell=True, text=True
+    )
+    match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
+    record_id = match.group("id")
+    # shutil.copyfile(
+    #     f"zips/{crate_name}.zip", os.path.join(TEST_OUTPUT_FOLDER, f"{crate_name}.zip")
+    # )
+
+    headers = get_request_headers()
+    record = fetch_inveniordm_record(record_id)
+    metadata = record["metadata"]
+
+    # Assert
+    assert expected_log_pattern_1 in log
+    # check one piece of metadata to confirm it was uploaded
+    assert len(record["files"]) == 1
+    result_zip = record["files"][0]
+    assert result_zip["filename"] == f"{crate_name}.zip"
+    # with open(f"{crate_name}.zip", "rb") as local_file:
+    #     assert result_zip["checksum"] == hashlib.md5(local_file)
+    # assert local_file.read() == remote_file_data.decode()
 
 
 def test_cli__datacite():
