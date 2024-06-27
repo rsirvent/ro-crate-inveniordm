@@ -72,7 +72,7 @@ def main():
     no_upload = args.no_upload
     omit_roc_files = args.omit_roc_files
     publish = args.publish
-    zip = args.zip
+    as_zip = args.zip
 
     datacite_file = datacite_list[0] if datacite_list else None
 
@@ -82,7 +82,7 @@ def main():
         no_upload=no_upload,
         omit_roc_files=omit_roc_files,
         publish=publish,
-        zip=zip,
+        as_zip=as_zip,
     )
 
 
@@ -92,7 +92,7 @@ def deposit(
     no_upload: bool = False,
     omit_roc_files: bool = False,
     publish: bool = False,
-    zip: bool = False,
+    as_zip: bool = False,
 ):
     """
     The main function of the script.
@@ -113,7 +113,7 @@ def deposit(
     # Exclude RO-Crate metadata, and RO-Crate website files
     all_files = []
 
-    if zip:
+    if as_zip:
         print("Creating zipped crate")
         name = os.path.basename(ro_crate_dir.strip("/"))
         crate_zip_path = shutil.make_archive(
