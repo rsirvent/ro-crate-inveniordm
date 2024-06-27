@@ -1,8 +1,8 @@
 import json
 import sys
 
-import mapping.condition_functions as cf
-import mapping.processing_functions as pf
+import rocrate_inveniordm.mapping.condition_functions as cf
+import rocrate_inveniordm.mapping.processing_functions as pf
 
 
 def main():

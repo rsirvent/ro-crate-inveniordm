@@ -2,7 +2,8 @@ import os
 import pytest
 from requests.exceptions import HTTPError
 
-from deposit import deposit
+from rocrate_inveniordm.deposit import deposit
+import rocrate_inveniordm.upload.credentials as credentials
 from test.unit.utils import (
     add_entity_to_template,
     fetch_inveniordm_record,
@@ -12,7 +13,6 @@ from test.unit.utils import (
     load_template_rc,
     set_field_in_template_rde,
 )
-import upload.credentials as credentials
 
 TEST_DATA_FOLDER = "test/data"
 TEST_OUTPUT_FOLDER = "test/output"

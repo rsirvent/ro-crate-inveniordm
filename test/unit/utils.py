@@ -1,7 +1,7 @@
 import json
 import requests
 
-import upload.credentials as credentials
+import rocrate_inveniordm.upload.credentials as credentials
 
 
 def load_template_rc(file="test/data/template-crate.json"):

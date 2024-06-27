@@ -14,8 +14,8 @@ import os
 import shutil
 import sys
 
-import mapping.converter as converter
-import upload.uploader as uploader
+import rocrate_inveniordm.mapping.converter as converter
+import rocrate_inveniordm.upload.uploader as uploader
 
 
 def main():

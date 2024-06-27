@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 import pytz
 
-import mapping.condition_functions as cf
+import rocrate_inveniordm.mapping.condition_functions as cf
 
 
 def test_is_uri__true():
