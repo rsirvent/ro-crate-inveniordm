@@ -114,10 +114,10 @@ def deposit(
     all_files = []
 
     if as_zip:
-        print("Creating zipped crate")
-        name = os.path.basename(ro_crate_dir.strip("/"))
+        crate_name = os.path.basename(ro_crate_dir.strip("/"))
+        print(f"Creating zipped crate {crate_name}.zip")
         crate_zip_path = shutil.make_archive(
-            os.path.join("zips", name),
+            crate_name,
             "zip",
             root_dir=ro_crate_dir,
         )
