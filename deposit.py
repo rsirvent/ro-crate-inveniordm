@@ -11,6 +11,7 @@ import argparse
 import glob
 import json
 import os
+import shutil
 import sys
 
 import mapping.converter as converter
@@ -71,7 +72,7 @@ def main():
     no_upload = args.no_upload
     omit_roc_files = args.omit_roc_files
     publish = args.publish
-    zip = args.zip
+    use_zip = args.zip
 
     datacite_file = datacite_list[0] if datacite_list else None
 
@@ -81,7 +82,7 @@ def main():
         no_upload=no_upload,
         omit_roc_files=omit_roc_files,
         publish=publish,
-        zip=zip,
+        use_zip=use_zip,
     )
 
 
@@ -91,7 +92,7 @@ def deposit(
     no_upload: bool = False,
     omit_roc_files: bool = False,
     publish: bool = False,
-    zip: bool = False,
+    use_zip: bool = False,
 ):
     """
     The main function of the script.
@@ -112,13 +113,23 @@ def deposit(
     # Exclude RO-Crate metadata, and RO-Crate website files
     all_files = []
 
-    for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
-        if omit_roc_files and (
-            "ro-crate-preview" in file or "ro-crate-metadata.json" in file
-        ):
-            continue
-        if os.path.isfile(file):
-            all_files.append(file)
+    if use_zip:
+        crate_name = os.path.basename(ro_crate_dir.strip("/"))
+        print(f"Creating zipped crate {crate_name}.zip")
+        crate_zip_path = shutil.make_archive(
+            crate_name,
+            "zip",
+            root_dir=ro_crate_dir,
+        )
+        all_files.append(crate_zip_path)
+    else:
+        for file in glob.glob(f"{ro_crate_dir}/**", recursive=True):
+            if omit_roc_files and (
+                "ro-crate-preview" in file or "ro-crate-metadata.json" in file
+            ):
+                continue
+            if os.path.isfile(file):
+                all_files.append(file)
 
     ro_crate_metadata_file = os.path.join(ro_crate_dir, "ro-crate-metadata.json")
 

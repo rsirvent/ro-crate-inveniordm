@@ -101,15 +101,27 @@ def upload_file(record_id, file_path):
     print(file_name)
 
     # Upload file content
-    with open(file_path, "r") as f:
-        resp = requests.put(
-            f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content",
-            data=f,
-            headers=headers_stream,
-        )
-        if resp.status_code != 200:
-            print(f"Could not upload file content: {resp.status_code} {resp.text}")
-            sys.exit(1)
+    upload_url = f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content"
+    try:
+        # regular file
+        with open(file_path, "r") as f:
+            resp = requests.put(
+                upload_url,
+                data=f,
+                headers=headers_stream,
+            )
+    except UnicodeDecodeError:
+        # binary file
+        with open(file_path, "rb") as f:
+            resp = requests.put(
+                upload_url,
+                data=f,
+                headers=headers_stream,
+            )
+
+    if resp.status_code != 200:
+        print(f"Could not upload file content: {resp.status_code} {resp.text}")
+        sys.exit(1)
 
     # Complete draft file upload
     resp = requests.post(

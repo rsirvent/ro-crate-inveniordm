@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 import pytest
 import pathlib
@@ -108,6 +109,39 @@ def test_created_invenio_records(crate_name):
         assert len(record["files"]) == 0
     assert record["state"] == "unsubmitted"
     assert record["submitted"] is False
+
+
+def test_cli__zip():
+    """Test uploading RO-Crate as a single zip file."""
+    # Arrange
+    crate_name = "test-ro-crate"
+    crate_path = os.path.join(TEST_DATA_FOLDER, crate_name)
+    expected_log_pattern_1 = "Creating zipped crate"
+    expected_log_pattern_2 = r"^Successfully created record (?P<id>[0-9]*)$"
+
+    # Act
+    # note - check_output raises CalledProcessError if exit code is non-zero
+    log = subprocess.check_output(
+        f"python deposit.py {crate_path} -z", shell=True, text=True
+    )
+    match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
+    record_id = match.group("id")
+    shutil.copyfile(
+        f"{crate_name}.zip", os.path.join(TEST_OUTPUT_FOLDER, f"{crate_name}.zip")
+    )
+
+    record = fetch_inveniordm_record(record_id)
+
+    # Assert
+    assert expected_log_pattern_1 in log
+    assert len(record["files"]) == 1
+    # check filename
+    result_zip = record["files"][0]
+    assert result_zip["filename"] == f"{crate_name}.zip"
+    # check MD5 checksum
+    with open(f"{crate_name}.zip", "rb") as local_file:
+        local_checksum = hashlib.md5(local_file.read()).hexdigest()
+    assert result_zip["checksum"] == local_checksum
 
 
 def test_cli__datacite():
