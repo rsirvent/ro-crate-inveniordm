@@ -167,9 +167,7 @@ def deposit(
         print(f"Created datacite-out.json, skipping upload.")
         return None
     else:
-        record_id = uploader.deposit(
-            data_cite_metadata, all_files, publish=publish, zip=zip
-        )
+        record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)
 
         print(f"Successfully created record {record_id}")
         return record_id
