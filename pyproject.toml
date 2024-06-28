@@ -8,7 +8,11 @@ build-backend = "poetry.core.masonry.api"
 name = "rocrate-inveniordm"
 version = "2.0.0"
 description = "Upload RO-Crates to InvenioRDM and automatically fill the metadata. Supports any InvenioRDM instance, including Zenodo."
-authors = ["Eli Chadwick <eli.chadwick@manchester.ac.uk>"]
+authors = [
+    "Philipp Beer",
+    "Milan Szente",
+    "Eli Chadwick <eli.chadwick@manchester.ac.uk>",
+]
 maintainers = ["Eli Chadwick <eli.chadwick@manchester.ac.uk>"]
 license = "MIT"
 readme = "README.md"
