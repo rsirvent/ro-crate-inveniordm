@@ -75,7 +75,9 @@ After verifying and adjusting the DataCite file, use the `-d` option to tell the
 
 The project aims at decoupling the definition of the mapping between RO-Crates and DataCite from code. This means, that users can quickly change/add/remove mapping rules without code changes. 
 
-For more information, see [Mapping](docs/mapping.md).
+To find out how each piece of RO-Crate metadata is converted to DataCite, see [How RO-Crate metadata is mapped to DataCite](docs/all-mappings.md).
+
+For technical details on the implementation, see [Mapping](docs/mapping.md).
 
 ## Results
 

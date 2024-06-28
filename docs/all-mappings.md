@@ -1,4 +1,8 @@
-# Notes on Mapping
+# How RO-Crate metadata is mapped to DataCite
+
+DataCite is the data format used by InvenioRDM when uploading a record through the API. This document describes how different parts of the RO-Crate metadata are converted into the DataCite format.
+
+Note that RO-Crate and DataCite each contain features that the other does not have, so it is difficult to create a fully accurate mapping and some information may be lost along the way. You should always check the outputs to ensure their accuracy before publishing your record.
 
 ## Mapping of resource type
 
@@ -23,7 +27,7 @@
 - in case `name` does not exist, it falls back to using the value of `@alternativeName`
 - in case neither of those exist, `title` is assigned `:unkn`
 
-## Mapping of additional title
+## Mapping of additional title 
 
 - `@alternativeName` is mapped to `additional_titles`
 - a new array entry in `additional_titles` is added

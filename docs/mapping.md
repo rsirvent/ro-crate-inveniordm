@@ -4,7 +4,7 @@ The project aims at decoupling the definition of the mapping between RO-Crates a
 
 Relative to the root folder of the package `src/rocrate_inveniordm/`, the mapping is implemented in `mapping/converter.py`. The mapping rules are defined in `mapping/mapping.json`. Processing functions and condition functions are defined in `mapping/processing_functions.py` and `condition_functions.py`, respectively. 
 
-A textual description including shortcomings and assumptions of the mapping can be found in [mapping-notes.md](./mapping-notes.md).
+A human-friendly description of all mappings implemented, including shortcomings and assumptions, can be found in [all-mappings.md](./all-mappings.md).
 
 ## Mapping format
 
@@ -89,7 +89,7 @@ Specifying the DataCite field is done in a similar fashion.
 
 ### Processing functions
 
-Processing functions are functions that are applied to the raw source value extracted from the RO-Crates metadata file. When a processing function wants to be applied to a mapping rule, the `processing` entry is assigned the value `$<function_name>`. The function then needs to be implemented in `/mapping/processing_functions.py`. 
+Processing functions are functions that are applied to the raw source value extracted from the RO-Crates metadata file. When a processing function wants to be applied to a mapping rule, the `processing` entry is assigned the value `$<function_name>`. The function then needs to be implemented in `mapping/processing_functions.py`. 
 
 **Example**
 
@@ -103,7 +103,7 @@ Given is the following mapping of the author type:
 }
 ```
 
-The value `Person` in the RO-Crates metadata file should be mapped to the value `personal`. Also, the value `Organization` should be mapped to the value `organizational`. The function `authorProcessing` can now be implemented in `/mapping/processing_functions.py` to achieve this logic. Note that the value of the `processing` key in the mapping rule and the function name need to coincide:
+The value `Person` in the RO-Crates metadata file should be mapped to the value `personal`. Also, the value `Organization` should be mapped to the value `organizational`. The function `authorProcessing` can now be implemented in `mapping/processing_functions.py` to achieve this logic. Note that the value of the `processing` key in the mapping rule and the function name need to coincide:
 
 ```py
 def authorProcessing(value):
@@ -137,7 +137,7 @@ The mapping of DOI identifiers looks as follows:
 }
 ```
 
-The mapping should only be executed, if the value in the `identifier` field in the RO-Crates metadata file is indeed a DOI identifier. This check can be achieved by defining the `doi` function in `/mapping/condition_functions.py`. Note that the value of the `onlyIf` key in the mapping rule and the function name need to coincide:
+The mapping should only be executed, if the value in the `identifier` field in the RO-Crates metadata file is indeed a DOI identifier. This check can be achieved by defining the `doi` function in `mapping/condition_functions.py`. Note that the value of the `onlyIf` key in the mapping rule and the function name need to coincide:
 
 ```py
 def doi(value):
