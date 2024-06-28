@@ -13,3 +13,6 @@ mapping/__pycache__
 
 # test outputs
 test/output
+.coverage
+/datacite-out.json
+/test-ro-crate.zip
