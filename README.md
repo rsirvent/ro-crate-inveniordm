@@ -4,7 +4,7 @@
 
 Command line tool to deposit an [RO-Crate](https://www.researchobject.org/ro-crate/) to an [InvenioRDM](https://inveniordm.web.cern.ch/) repository. 
 
-Originally developed as [`ro-crates-deposit`](https://github.com/beerphilipp/ro-crates-deposit) by Philipp Beer and Milan Szente. [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8127644.svg)](https://doi.org/10.5281/zenodo.8127644)
+Originally developed (up to [v1.0.2](https://github.com/beerphilipp/ro-crates-deposit/releases/tag/v1.0.2)) as [`ro-crates-deposit`](https://github.com/beerphilipp/ro-crates-deposit) by Philipp Beer and Milan Szente. [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8127644.svg)](https://doi.org/10.5281/zenodo.8127644)
 
 ## Requirements
 
