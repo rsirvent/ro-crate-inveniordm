@@ -2,7 +2,7 @@ import os
 import pytest
 from unittest import mock
 
-import upload.credentials as credentials
+import rocrate_inveniordm.upload.credentials as credentials
 
 
 @mock.patch.dict(os.environ, {"INVENIORDM_API_KEY": ""})

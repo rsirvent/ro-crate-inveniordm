@@ -34,7 +34,7 @@ def test_created_datacite_files(crate_name):
     # note - check_output raises CalledProcessError if exit code is non-zero
     # --no-upload prevents upload and generates DataCite files only
     log = subprocess.check_output(
-        f"python deposit.py {crate_path} --no-upload", shell=True, text=True
+        f"rocrate_inveniordm {crate_path} --no-upload", shell=True, text=True
     )
     # preserve data files and log in TEST_OUTPUT_FOLDER
     shutil.copyfile(
@@ -67,7 +67,7 @@ def test_created_invenio_records(crate_name):
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
     log = subprocess.check_output(
-        f"python deposit.py {crate_path}", shell=True, text=True
+        f"rocrate_inveniordm {crate_path}", shell=True, text=True
     )
     with open(
         os.path.join(TEST_OUTPUT_FOLDER, f"log-upload-{crate_name}.txt"),
@@ -122,7 +122,7 @@ def test_cli__zip():
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
     log = subprocess.check_output(
-        f"python deposit.py {crate_path} -z", shell=True, text=True
+        f"rocrate_inveniordm {crate_path} -z", shell=True, text=True
     )
     match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
     record_id = match.group("id")
@@ -159,7 +159,7 @@ def test_cli__datacite():
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
     log = subprocess.check_output(
-        f"python deposit.py {crate_path} -d {compare_path}", shell=True, text=True
+        f"rocrate_inveniordm {crate_path} -d {compare_path}", shell=True, text=True
     )
     match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
     record_id = match.group("id")
@@ -186,7 +186,7 @@ def test_cli__omit_roc_files():
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
     log = subprocess.check_output(
-        f"python deposit.py {crate_path} -o", shell=True, text=True
+        f"rocrate_inveniordm {crate_path} -o", shell=True, text=True
     )
     match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
     record_id = match.group("id")
@@ -215,7 +215,7 @@ def test_cli__publish():
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
     log = subprocess.check_output(
-        f"python deposit.py {crate_path} -p", shell=True, text=True
+        f"rocrate_inveniordm {crate_path} -p", shell=True, text=True
     )
     match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
     record_id = match.group("id")

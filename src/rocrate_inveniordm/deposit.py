@@ -14,8 +14,8 @@ import os
 import shutil
 import sys
 
-import mapping.converter as converter
-import upload.uploader as uploader
+import rocrate_inveniordm.mapping.converter as converter
+import rocrate_inveniordm.upload.uploader as uploader
 
 
 def main():
@@ -164,7 +164,7 @@ def deposit(
 
     # Upload and publish files, depending on no_upload and publish options
     if no_upload:
-        print(f"Created datacite-out.json, skipping upload.")
+        print("Created datacite-out.json, skipping upload.")
         return None
     else:
         record_id = uploader.deposit(data_cite_metadata, all_files, publish=publish)

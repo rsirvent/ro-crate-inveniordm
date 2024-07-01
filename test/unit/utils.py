@@ -1,7 +1,8 @@
 import json
 import requests
 
-import upload.credentials as credentials
+import rocrate_inveniordm.mapping.converter as converter
+import rocrate_inveniordm.upload.credentials as credentials
 
 
 def load_template_rc(file="test/data/template-crate.json"):
@@ -25,9 +26,8 @@ def add_entity_to_template(entity, rc):
     return rc
 
 
-def get_single_mapping(mapping_class, rule, mapping_file_name="mapping/mapping.json"):
-    mapping_file = open(mapping_file_name)
-    m = json.load(mapping_file)
+def get_single_mapping(mapping_class, rule):
+    m = converter.load_mapping_json()
 
     if not mapping_class.endswith("_mapping"):
         mapping_class += "_mapping"
@@ -37,9 +37,8 @@ def get_single_mapping(mapping_class, rule, mapping_file_name="mapping/mapping.j
     return rule
 
 
-def get_mapping_class(mapping_class, mapping_file_name="mapping/mapping.json"):
-    mapping_file = open(mapping_file_name)
-    m = json.load(mapping_file)
+def get_mapping_class(mapping_class):
+    m = converter.load_mapping_json()
 
     if not mapping_class.endswith("_mapping"):
         mapping_class += "_mapping"

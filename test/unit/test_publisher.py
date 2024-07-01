@@ -7,7 +7,11 @@ from test.unit.utils import (
 
 import pytest
 
-from mapping.converter import apply_mapping, get_mapping_paths, setup_dc
+from rocrate_inveniordm.mapping.converter import (
+    apply_mapping,
+    get_mapping_paths,
+    setup_dc,
+)
 
 publisher_string = "Test University"
 publisher_entity = {

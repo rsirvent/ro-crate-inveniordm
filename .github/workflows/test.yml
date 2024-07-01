@@ -25,11 +25,13 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install poetry
+      run: |
+        sudo apt install -y pipx
+        pipx install poetry
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+        poetry install
     - name: Set up credentials
       run: |
         echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
@@ -39,10 +41,10 @@ jobs:
         ZENODO_SANDBOX_API_KEY : ${{secrets.ZENODO_SANDBOX_API_KEY}}
     - name: Lint with mypy
       run: |
-        mypy . --ignore-missing-imports
+        poetry run mypy . --ignore-missing-imports
     - name: Test with pytest
       run: |
-        pytest
+        poetry run pytest
     - uses: actions/upload-artifact@v4
       with:
         name: test-outputs-${{ matrix.os }}-python${{ matrix.python-version }}

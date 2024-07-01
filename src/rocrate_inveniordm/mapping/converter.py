@@ -1,8 +1,10 @@
 import json
 import sys
+from importlib import resources
+import rocrate_inveniordm.mapping as mapping
 
-import mapping.condition_functions as cf
-import mapping.processing_functions as pf
+import rocrate_inveniordm.mapping.condition_functions as cf
+import rocrate_inveniordm.mapping.processing_functions as pf
 
 
 def main():
@@ -39,6 +41,13 @@ def get_arrays_from_from_values(input_list):
     return output_list
 
 
+def load_mapping_json() -> dict:
+    mapping_file = resources.files(mapping) / "mapping.json"
+    with mapping_file.open("r") as f:
+        mapping_json = json.load(f)
+    return mapping_json
+
+
 def convert(rc, metadata_only=False):
     """
     Convert a RO-Crate to a DataCite object
@@ -46,8 +55,8 @@ def convert(rc, metadata_only=False):
     :param rc: The RO-Crate
     :param metadata_only: Whether it is a metadata-only DataCite
     """
-    mapping_file = open("mapping/mapping.json")
-    m = json.load(mapping_file)
+
+    m = load_mapping_json()
 
     dc = setup_dc()
     if metadata_only:

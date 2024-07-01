@@ -1,8 +1,18 @@
+import json
 import re
 
 import pytest
 
-import mapping.converter as converter
+import rocrate_inveniordm.mapping.converter as converter
+
+
+def test_load_mapping_json():
+    with open("src/rocrate_inveniordm/mapping/mapping.json") as f:
+        expected_json = json.load(f)
+
+    result_json = converter.load_mapping_json()
+
+    assert result_json == expected_json
 
 
 def test_check_condition__true():

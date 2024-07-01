@@ -11,7 +11,7 @@ import os
 import sys
 
 import requests
-import upload.credentials as credentials
+import rocrate_inveniordm.upload.credentials as credentials
 
 api_url = credentials.get_repository_base_url()
 
