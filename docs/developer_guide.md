@@ -16,7 +16,7 @@ The `.env` file must always be configured as it is used by `pytest`. However, fo
 
 Clone the repository:
 ```
-git clone git@github.com:ResearchObject/ro-crates-deposit.git
+git clone git@github.com:ResearchObject/ro-crate-inveniordm.git
 cd ro-crate-inveniordm
 ```
 

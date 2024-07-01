@@ -23,7 +23,7 @@ publisher_entity = {
 
 
 @pytest.mark.xfail(
-    reason="known bug - https://github.com/ResearchObject/ro-crates-deposit/issues/1"
+    reason="known bug - https://github.com/ResearchObject/ro-crate-inveniordm/issues/1"
 )
 def test_publisher_string():
     rc = load_template_rc()
