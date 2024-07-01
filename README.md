@@ -43,11 +43,9 @@ If you want to change your target InvenioRDM instance, you can set the environme
 
 ### General usage
 
-Run `rocrate_inveniordm <ro-crate-dir>` with `<ro-crate-dir>` being the path to the RO-Crate directory. The record is saved as a draft and not published.
+Run `rocrate_inveniordm <ro-crate-dir>` with `<ro-crate-dir>` being the path to the RO-Crate directory. This will upload the record (including files and metadata) as a draft to your chosen InvenioRDM instance, and save the generated DataCite metadata as `datacite-out.json` in the current directory.
 
-You can publish the record through the web interface of your chosen instance, or you can instead run the same command with the `-p` option to publish the record.
-
-Additional options can be found by running `rocrate_inveniordm --help`:
+By default, the record is not published after upload. You can publish the record through the web interface of your chosen instance, or you can instead run the same command with the `-p` option to re-upload the crate into a new record and publish it immediately.
 
 ### Uploading as a zip file
 
@@ -63,13 +61,17 @@ will result in an uploaded file called `test-ro-crate.zip`.
 
 This tool is a *best-effort* approach. After converting the metadata file, the resulting DataCite file is stored as `datacite-out.json` in the root directory. You can adjust the generated DataCite file as needed, and can run the program in two stages to facilitate this:
 
-First, run the program with the `--no-upload` option, to create the DataCite file without uploading anything to InvenioRDM:
+First, run the program with the `--no-upload` option, to create the DataCite file in the current directory without uploading anything to InvenioRDM:
 
 `rocrate_inveniordm --no-upload <ro-crate-dir>`.
 
 After verifying and adjusting the DataCite file, use the `-d` option to tell the program to use this file for upload and skip the process of conversion:
 
 `rocrate_inveniordm -d <datacite-file> <ro-crate-dir>`.
+
+### Other options
+
+Additional options can be found by running `rocrate_inveniordm --help`.
 
 ## Mapping
 

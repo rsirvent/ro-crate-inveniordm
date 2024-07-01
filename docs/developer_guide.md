@@ -10,16 +10,21 @@
     - in case of TU Wien test instance: use `https://test.researchdata.tuwien.ac.at/`
 1. Run `source .env` to set the environment variables for the session
 
-If you prefer to set the environment variables `INVENIORDM_API_KEY` and `INVENIORDM_BASE_URL` another way (e.g. in `~/.bashrc`), you can do that instead. However, the `.env` file must also be configured as it is used by `pytest`.
+The `.env` file must always be configured as it is used by `pytest`. However, for the final step, if you prefer to set the environment variables `INVENIORDM_API_KEY` and `INVENIORDM_BASE_URL` another way (e.g. in `~/.bashrc`), you can do that instead. 
 
 ### Set up the Python environment
+
+Clone the repository:
+```
+git clone git@github.com:ResearchObject/ro-crates-deposit.git
+cd ro-crate-inveniordm
+```
 
 If you do not already have `poetry` installed, install it following the [Poetry installation documentation](https://python-poetry.org/docs/#installation).
 
 Then install dependencies from `poetry.lock`:
 
 ```bash
-cd ro-crate-inveniordm
 poetry install
 ```
 
