@@ -103,8 +103,6 @@ def deposit(
     The main function of the script.
     It takes a RO-Crate directory as input and uploads it to an InvenioRDM repository.
 
-    TODO: implement what the zip argument says it will do!
-
     :param ro_crate_dir: Path to the RO-Crate directory to upload.
     :param datacite_file: Path to a DataCite metadata file which should be used for the
         upload. Skips the conversion process from RO-Crate metadata to DataCite.
