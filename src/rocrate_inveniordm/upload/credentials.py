@@ -3,7 +3,7 @@
 
     :author: Philipp Beer
     :author: Milan Szente
-    :author: Eli Chadwick 
+    :author: Eli Chadwick
 """
 
 import os

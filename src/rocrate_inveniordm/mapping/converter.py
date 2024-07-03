@@ -177,7 +177,8 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
 
         if from_value is not None:
             print(
-                f"\t\t|- Adding {from_value} to {to_mapping_value} with path {path.copy()}"
+                f"\t\t|- Adding {from_value} to {to_mapping_value} with path "
+                f"{path.copy()}"
             )
             rule_applied = True
             print(dc, to_mapping_value, from_value)
@@ -259,7 +260,8 @@ def rc_get_rde(rc):
     :return: The Root Data Entity of the given RO-Crate.
     """
 
-    # Following the RO-Crate specification (https://www.researchobject.org/ro-crate/1.1/root-data-entity.html),
+    # Following the RO-Crate specification
+    # (https://www.researchobject.org/ro-crate/1.1/root-data-entity.html),
     # use the following algorithm to find the RDE:
     #
     # For each entity in @graph array
@@ -386,7 +388,8 @@ def get_rc(rc, from_key, path=[]):
     print(f"\t\t|- Value for key {from_key} is {result}")
 
     if result and isinstance(result, dict):
-        # If the value is a JSON object, then we ignore the rule (since another rule must be implemented on how to handle it)
+        # If the value is a JSON object, then we ignore the rule (since another rule
+        # must be implemented on how to handle it)
         return None
 
     return result
@@ -478,9 +481,11 @@ def format_value(format, value):
     Formats the given value according to the given format.
     The format can be a string or a dictionary.
     If the format is a string, the value is inserted at the position of @@this.
-    If the format is a dictionary, the value is inserted at the position of @@this in each value of the dictionary.
+    If the format is a dictionary, the value is inserted at the position of @@this in
+    each value of the dictionary.
 
-    For example, if the format is {"a": "@@this", "b": "c"}, and the value is "d", the result is {"a": "d", "b": "c"}.
+    For example, if the format is {"a": "@@this", "b": "c"}, and the value is "d", the
+    result is {"a": "d", "b": "c"}.
 
     :param format: The format to use.
     :param value: The value to insert.
@@ -559,7 +564,8 @@ def set_dc(dictionary, key, value=None, path=[]):
 def check_condition(condition_rule, value):
     """
     Checks if a value matches a condition rule.
-    The condition rule is a string that starts with ? and is followed by the name of the function to apply.
+    The condition rule is a string that starts with ? and is followed by the name of the
+    function to apply.
     The function must be defined in condition_functions.py.
 
     :param condition_rule: The condition rule to apply.
@@ -578,7 +584,8 @@ def check_condition(condition_rule, value):
 def process(process_rule, value):
     """
     Processes a value according to a processing rule.
-    The processing rule is a string that starts with $ and is followed by the name of the function to apply.
+    The processing rule is a string that starts with $ and is followed by the name of
+    the function to apply.
     The function must be defined in processing_functions.py.
 
     :param process_rule: The processing rule to apply.
