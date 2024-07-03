@@ -203,53 +203,103 @@ def get_paths(rc, key):
     return paths
 
 
-def get_paths_recursive(rc, temp, keys, paths, path):
+def get_paths_recursive(
+    rc: dict,
+    entity_or_dict: dict | str | int | float | None,
+    keys: list[str],
+    paths: list,
+    path: list,
+):
+    """Recursively find paths within an RO-Crate for a list of keys.
 
+    :param rc: Dictionary containing the RO-Crate metadata to find paths in
+    :param entity_or_dict: The RO-Crate entity or regular dictionary which contains the
+        first key in the list
+    :param keys: A list of keys. Each key should represent a dict or reference to an
+        entity which contains the next key in the list, except the final key which may
+        represent anything. e.g. ["$author[]", "name"]
+    :param paths: Current list of known paths (modified in place)
+    :param path: List of components of the current path, e.g. ["author",1,"name"]
+    """
+
+    # end of the recursive chain
     if len(keys) == 0:
         paths.append(path)
         return
+    elif entity_or_dict is None or not isinstance(entity_or_dict, dict):
+        raise ValueError(
+            f"Key list is not empty ({keys}), but current entity is not a dict "
+            f"({entity_or_dict})."
+        )
 
     current_key = keys[0]
 
-    # clean key
-    cleaned_key = current_key
-    cleaned_key = cleaned_key.replace("[]", "").replace("$", "")
-    if temp is None:
-        return
-    if cleaned_key not in temp.keys():
+    # clean key and check it is in the current entity
+    cleaned_key = clean_key(current_key)
+    if entity_or_dict is None or cleaned_key not in entity_or_dict.keys():
         return
 
+    # if the key indicates that it may be an array, get paths for every element in the
+    # array
     if current_key.endswith("[]"):
         new_current_key = current_key
         if current_key.startswith("$"):
             new_current_key = current_key[1:]
-        if isinstance(temp[new_current_key[:-2]], list):
-            for i in range(len(temp[new_current_key[:-2]])):
+        value = entity_or_dict[new_current_key[:-2]]
+        # if value for this key is a list, get paths recursively for each item
+        if isinstance(value, list):
+            for i in range(len(value)):
                 new_path = path.copy()
                 new_path.append(i)
-                if current_key.startswith("$"):
-                    new_temp = get_rc_ref(rc, temp, current_key[:-2], i)
-                else:
-                    new_temp = temp[new_current_key[:-2]][i]
 
+                new_temp = dereference(rc, entity_or_dict, current_key[:-2], i)
+
+                # find paths within the next entity/dict using subsequent keys in the
+                # list
                 get_paths_recursive(rc, new_temp, keys[1:], paths, new_path)
+
+        # value is not a list
         else:
             new_path = path.copy()
-            new_path.append(-1)
-            if current_key.startswith("$"):
-                new_temp = get_rc_ref(rc, temp, current_key[:-2])
-            else:
-                new_temp = temp[current_key[:-2]]
+            new_path.append(-1)  # indicate we are not navigating a list
+            new_temp = dereference(rc, entity_or_dict, current_key[:-2])
 
+            # find parts within the next entity/dict using subsequent keys in the list
             get_paths_recursive(rc, new_temp, keys[1:], paths, new_path)
+
+    # key is not for an array
     else:
-        if current_key == "$":
-            temp = get_rc_ref(rc, temp, current_key)
-        else:
-            temp = temp[current_key]
-        get_paths_recursive(rc, temp, keys[1:], paths, path)
+        entity_or_dict = dereference(rc, entity_or_dict, current_key)
+
+        # find parts within the next entity/dict using subsequent keys in the list
+        get_paths_recursive(rc, entity_or_dict, keys[1:], paths, path)
 
     return
+
+
+def dereference(
+    rc: dict, entity_or_dict: dict, key: str, index: int | None = None
+) -> dict | str | int | float | None:
+    """Returns the desired value or array element, finding the referenced entity in the
+    RO-Crate if appropriate.
+
+    :param rc:  Dictionary of RO-Crate metadata
+    :param entity_or_dict: The RO-Crate entity or regular dictionary which contains the
+        key
+    :param key: The key to dereference. It may start with $ but should not contain [].
+    :param index: The index of the desired array element, if applicable. Defaults to
+        None.
+    :return: A dictionary with the dereferenced entity
+    """
+    # if the key expects references to other entities,
+    # find the referenced entity
+    if key.startswith("$"):
+        return get_rc_ref(rc, entity_or_dict, key, index)
+    # otherwise, use the raw value
+    elif index and index != -1:
+        return entity_or_dict[key][index]
+    else:
+        return entity_or_dict[key]
 
 
 def rc_get_rde(rc):
