@@ -13,7 +13,7 @@ class MappingException(RuntimeError):
             "issue on GitHub: "
             "https://github.com/ResearchObject/ro-crate-inveniordm/issues"
         )
-        super().__init__(message)
+        super().__init__(self.message)
 
 
 def load_mapping_json() -> dict:
@@ -90,6 +90,7 @@ def format_value(format, value):
     If the format is a string, the value is inserted at the position of @@this.
     If the format is a dictionary, the value is inserted at the position of @@this in
     each value of the dictionary.
+    TODO rename to be less ambiguous about purpose
 
     For example, if the format is {"a": "@@this", "b": "c"}, and the value is "d", the
     result is {"a": "d", "b": "c"}.
@@ -108,7 +109,6 @@ def format_value(format, value):
     elif isinstance(format, bool):
         return format
     else:
-
         raise TypeError(
             f"Format must be a string, dictionary, or bool, but is {type(format)}."
         )
