@@ -169,12 +169,12 @@ def get_rc_ref(
 
     id_val = parent.get(from_key[1:])
     if isinstance(id_val, list):
-        if not index or index == -1:
+        if index is None or index == -1:
             raise ValueError(
                 f"Value of {from_key} is a list, but no index was provided."
             )
         id_val = id_val[index]
-    elif index and index != -1:
+    elif index is not None and index != -1:
         raise ValueError(
             f"Value of {from_key} is not a list, but an index was provided."
         )

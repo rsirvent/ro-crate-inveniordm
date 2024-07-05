@@ -250,17 +250,16 @@ def get_paths_recursive(
     if len(keys) == 0:
         paths.append(path)
         return
-    elif entity_or_dict is None or not isinstance(entity_or_dict, dict):
-        raise ValueError(
-            f"Key list is not empty ({keys}), but current entity is not a dict "
-            f"({entity_or_dict})."
-        )
 
     current_key = keys[0]
 
     # clean key and check it is in the current entity
     cleaned_key = clean_key(current_key)
-    if entity_or_dict is None or cleaned_key not in entity_or_dict.keys():
+    if (
+        entity_or_dict is None
+        or not isinstance(entity_or_dict, dict)
+        or cleaned_key not in entity_or_dict.keys()
+    ):
         return
 
     # if the key indicates that it may be an array, get paths for every element in the
