@@ -1,23 +1,24 @@
 import json
 import sys
-from importlib import resources
-import rocrate_inveniordm.mapping as mapping
 
 import rocrate_inveniordm.mapping.condition_functions as cf
 import rocrate_inveniordm.mapping.processing_functions as pf
-
-
-class MappingException(RuntimeError):
-    """Used for errors that relate to the loaded mapping."""
-
-    def __init__(self, message):
-        self.message = (
-            f"The loaded mapping is invalid: {message} "
-            "Please inform the rocrate-inveniordm package maintainers by raising an "
-            "issue on GitHub: "
-            "https://github.com/ResearchObject/ro-crate-inveniordm/issues"
-        )
-        super().__init__(message)
+from rocrate_inveniordm.mapping.mapping_utils import (
+    MappingException,
+    load_mapping_json,
+    get_arrays_from_from_values,
+    contains_atatthis,
+    clean_key,
+    format_value,
+    setup_dc,
+)
+from rocrate_inveniordm.mapping.crate_utils import (
+    dereference,
+    rc_get_rde,
+    get_rc_ref,
+    get_rc_ref_root,
+    get_value_from_rc,
+)
 
 
 def main():
@@ -39,42 +40,6 @@ def main():
         json.dump(output, outfile, indent=4)
 
     return
-
-
-def get_arrays_from_from_values(input_list: list) -> list:
-    """Given a list of "from-values" for a mapping, find which of them may be arrays.
-    "From-values" describe RO-Crate metadata fields which will be converted to DataCite
-    fields.
-
-    For example, the from-value "$author[].name" relates to the "name" property within
-    any entity which is listed as an "author" of another entity. In this case, the
-    referencing "author" value may be a string or an array, and may reference other
-    entities in the RO-Crate.
-
-    :param input_list: A list of from-values.
-    :return: A list of paths which include arrays.
-    """
-    output_set = set()
-    for string in input_list:
-        delimiter_index = string.rfind("[]")
-        if delimiter_index != -1:
-            processed_string = string[
-                : delimiter_index + 2
-            ]  # Include the "[]" in the output
-            output_set.add(processed_string)
-    output_list = list(output_set)
-    return output_list
-
-
-def load_mapping_json() -> dict:
-    """Load the mappings from the mapping.json file included with the package
-
-    :return: Dictionary containing the mapping
-    """
-    mapping_file = resources.files(mapping) / "mapping.json"
-    with mapping_file.open("r") as f:
-        mapping_json = json.load(f)
-    return mapping_json
 
 
 def convert(rc: dict, metadata_only: bool = False) -> dict:
@@ -336,86 +301,6 @@ def get_paths_recursive(
     return
 
 
-def dereference(
-    rc: dict, entity_or_dict: dict, key: str, index: int | None = None
-) -> dict | str | int | float | None:
-    """Returns the desired value or array element, finding the referenced entity in the
-    RO-Crate if appropriate.
-
-    :param rc:  Dictionary of RO-Crate metadata
-    :param entity_or_dict: The RO-Crate entity or regular dictionary which contains the
-        key
-    :param key: The key to dereference. It may start with $ but should not contain [].
-    :param index: The index of the desired array element, if applicable. Defaults to
-        None.
-    :return: A dictionary with the dereferenced entity
-    """
-    # if the key expects references to other entities,
-    # find the referenced entity
-    if key.startswith("$"):
-        return get_rc_ref(rc, entity_or_dict, key, index)
-    # otherwise, use the raw value
-    elif index and index != -1:
-        return entity_or_dict[key][index]
-    else:
-        return entity_or_dict[key]
-
-
-def rc_get_rde(rc):
-    """
-    Retrieves the Root Date Entity from the given RO-Crate.
-
-    :param rc: The RO-Crate to retrieve the RDE from.
-    :return: The Root Data Entity of the given RO-Crate.
-    """
-
-    # Following the RO-Crate specification
-    # (https://www.researchobject.org/ro-crate/1.1/root-data-entity.html),
-    # use the following algorithm to find the RDE:
-    #
-    # For each entity in @graph array
-    #   if the conformsTo property is a URI that starts with https://w3id.org/ro/crate/
-    #       from this entity's about object keep the @id URI as variable root
-    # For each entity in @graph array
-    #   if the entity has an @id URI that matches the root return it
-
-    root = None
-    graph = rc.get("@graph")
-    for entity in graph:
-        conformsTo = entity.get("conformsTo")
-        if (
-            conformsTo
-            and conformsTo.get("@id")
-            and conformsTo.get("@id").startswith("https://w3id.org/ro/crate/")
-        ):
-            root = entity.get("about").get("@id")
-
-    for entity in graph:
-        if entity.get("@id") == root:
-            return entity
-
-
-def contains_atatthis(value):
-    """
-    Checks if the given value contains the string "@@this".
-    The value can be a string or a dictionary.
-
-    :param value: The value to check.
-    :return: True if the value contains "@@this", False otherwise.
-    """
-    if isinstance(value, str):
-        return "@@this" in value
-    elif isinstance(value, dict):
-        for key, v in value.items():
-            if isinstance(v, str):
-                if "@@this" in v:
-                    return True
-            else:
-                return contains_atatthis(value[key])
-
-    return False
-
-
 def transform_to_target_format(format, value):
     """
     Transforms the given value to the given format.
@@ -436,212 +321,6 @@ def transform_to_target_format(format, value):
             return format
         print(f"\t\t|- Formatted value {value} is {format}")
     return format
-
-
-def get_value_from_rc(rc, from_key, path=[]):
-    """
-    Retrieves the value of the given key from the given RO-Crate.
-    A key consists of multiple subkeys, separated by a dot (.).
-    If a subkey starts with a $, then it is a reference to another key.
-
-    :param rc: The RO-Crate to retrieve the value from.
-    :param from_key: The key to retrieve the value from.
-    :param path: The path to the value, used to disambiguate arrays.
-    :return: The value of the given key in the given RO-Crate.
-    """
-    result = None
-
-    if not from_key:
-        return None
-
-    print(f"\t\t|- Retrieving value {from_key} with path {path} from RO-Crate.")
-    keys = from_key.split(".")
-    print(keys)
-    current_entity = rc_get_rde(rc)
-
-    for key in keys:
-        cleaned_key = clean_key(key)
-        print(f"\t\t|- Cleaned key: {cleaned_key}")
-        if key.startswith("$"):
-            # we need to dereference the key
-            index = None
-            if key.endswith("[]"):
-                index = path[0]
-                path = path[1:]
-                current_entity = get_rc_ref(
-                    rc, current_entity, "$" + cleaned_key, index
-                )
-            else:
-                current_entity = get_rc_ref(rc, current_entity, "$" + cleaned_key)
-
-            if current_entity is None:
-                return None
-
-        elif cleaned_key not in current_entity.keys():
-            # The key could not be found in the RO-Crate
-            return None
-
-        else:
-            if key.endswith("[]"):
-                index = path[0]
-                path = path[1:]
-                if index == -1:
-                    current_entity = current_entity.get(cleaned_key)
-                else:
-                    current_entity = current_entity.get(cleaned_key)[index]
-            else:
-                current_entity = current_entity.get(cleaned_key)
-
-    result = current_entity
-
-    print(f"\t\t|- Value for key {from_key} is {result}")
-
-    if result and isinstance(result, dict):
-        # If the value is a JSON object, then we ignore the rule (since another rule
-        # must be implemented on how to handle it)
-        return None
-
-    return result
-
-
-def clean_key(key: str) -> str:
-    """Given a key from the mapping, return the key as it would appear inside an entity,
-    Essentially, this strips any $ and [] characters which are used in the mapping keys.
-
-    :param key: The mapping key to clean
-    :return: The cleaned key
-    """
-    return key.replace("[]", "").replace("$", "")
-
-
-def get_rc_ref(
-    rc: dict, parent: dict, from_key: str, index: int | None = None
-) -> dict | None:
-    """
-    Retrieves the entity referenced by the given $-prefixed key from the given RO-Crate.
-
-    Example: Calling get_rc_ref(rc, parent, "$affiliation") on the following RO-Crate
-
-    rc: {
-        ...
-        {
-            "@id": "https://orcid.org/0000-0002-8367-6908",
-            "@type": "Person",
-            "name": "J. Xuan"
-            "affiliation": {"@id": "https:/abc"}
-        }
-        {
-            "@id": "https:/abc",
-            "@type": "Organization",
-            "name": "ABC University"
-        }
-    }
-
-    parent: {
-            "@id": "https://orcid.org/0000-0002-8367-6908",
-            "@type": "Person",
-            "name": "J. Xuan"
-            "affiliation": {"@id": "https:/abc"}
-        }
-
-    returns {
-            "@id": "https:/abc",
-            "@type": "Organization",
-            "name": "ABC University"
-        }
-    """
-    print(f"\t\t|- Retrieving referenced entity {from_key} from RO-Crate.")
-
-    if from_key and not from_key.startswith("$"):
-        raise MappingException(f"$-prefixed key expected, but {from_key} found.")
-
-    id_val = parent.get(from_key[1:])
-    if isinstance(id_val, list):
-        if not index or index == -1:
-            raise ValueError(
-                f"Value of {from_key} is a list, but no index was provided."
-            )
-        id_val = id_val[index]
-    elif index and index != -1:
-        raise ValueError(
-            f"Value of {from_key} is not a list, but an index was provided."
-        )
-
-    if isinstance(id_val, dict):
-        id = id_val.get("@id")
-        print(f"\t\t\t|- Id is {id}")
-    else:
-        return None
-
-    # find matching entity in crate
-    all_entities = rc.get("@graph", [])
-    assert isinstance(all_entities, list)
-
-    for entity in all_entities:
-        assert isinstance(entity, dict)
-        if entity.get("@id") == id:
-            print(f"\t\t\t|- Found entity {entity}")
-            return entity
-
-    return None
-
-
-def get_rc_ref_root(rc, from_key):
-    """
-    Retrieves the entity referenced by the given $-prefixed key from the given RO-Crate.
-
-    :param rc: The RO-Crate to retrieve the referenced entity from.
-    :param from_key: The $-prefixed key to retrieve the referenced entity from.
-    :return: The referenced entity of the given RO-Crate.
-    """
-    print(f"\t\t|- Retrieving referenced entity {from_key} from RO-Crate.")
-    if from_key and not from_key.startswith("$"):
-        raise Exception(f"$-prefixed key expected, but {from_key} found.")
-
-    keys = from_key.split(".")
-    root = rc_get_rde(rc)
-    if root.get(keys[0][1:]) is None:
-        print(f"\t\t|- Key {keys[0]} not found in RO-Crate.")
-        return None
-    target_entity_id = root.get(keys[0][1:]).get("@id")
-    target_entity = None
-
-    for entity in rc.get("@graph"):
-        if entity.get("@id") == target_entity_id:
-            target_entity = entity
-            break
-    return target_entity
-
-
-def format_value(format, value):
-    """
-    Formats the given value according to the given format.
-    The format can be a string or a dictionary.
-    If the format is a string, the value is inserted at the position of @@this.
-    If the format is a dictionary, the value is inserted at the position of @@this in
-    each value of the dictionary.
-
-    For example, if the format is {"a": "@@this", "b": "c"}, and the value is "d", the
-    result is {"a": "d", "b": "c"}.
-
-    :param format: The format to use.
-    :param value: The value to insert.
-    :return: The formatted value.
-    """
-    if isinstance(format, str):
-        return format.replace("@@this", value)
-    elif isinstance(format, dict):
-        # format = {}
-        for key, v in format.items():
-            format[key] = format_value(v, value)
-        return format
-    elif isinstance(format, bool):
-        return format
-    else:
-
-        raise TypeError(
-            f"Format must be a string, dictionary, or bool, but is {type(format)}."
-        )
 
 
 def set_dc(dictionary, key, value=None, path=[]):
@@ -736,27 +415,6 @@ def process(process_rule, value):
     except AttributeError:
         raise NotImplementedError(f"Function {process_rule} not implemented.")
     return function(value)
-
-
-def setup_dc() -> dict:
-    """Create an template for the DataCite metadata. Assumes that the record and its
-    files will be public and not embargoed.
-
-    See https://inveniordm.docs.cern.ch/reference/metadata/#metadata for details on the
-    DataCite format.
-
-    :return: Dictionary in DataCite metadata format
-    """
-    dc = {
-        "access": {
-            "record": "public",  # public or restricted; 1
-            "files": "public",  # public or restricted; 1
-            "embargo": {"active": False},  # 0-1
-        },
-        "metadata": {},
-        "files": {"enabled": True},
-    }
-    return dc
 
 
 if __name__ == "__main__":
