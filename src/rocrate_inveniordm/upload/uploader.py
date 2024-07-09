@@ -13,19 +13,14 @@ import sys
 import requests
 import rocrate_inveniordm.upload.credentials as credentials
 
-api_url = credentials.get_repository_base_url()
 
-headers = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {credentials.get_api_key()}",
-}
-
-headers_stream = {
-    "Accept": "application/json",
-    "Content-Type": "application/octet-stream",
-    "Authorization": f"Bearer {credentials.get_api_key()}",
-}
+def get_headers(content_type: str):
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": content_type,
+        "Authorization": f"Bearer {credentials.get_api_key()}",
+    }
+    return headers
 
 
 def deposit(metadata, files, publish=False):
@@ -52,10 +47,11 @@ def create_draft_record(metadata):
     :param files: The record's files.
     :returns: The record's id.
     """
+    api_url = credentials.get_repository_base_url()
     resp = requests.post(
         f"{api_url}/api/records",
         data=json.dumps(metadata),
-        headers=headers,
+        headers=get_headers("application/json"),
     )
 
     if resp.status_code != 201:
@@ -78,10 +74,11 @@ def start_draft_files_upload(record_id, files):
         _, filename = os.path.split(file)
         payload.append({"key": filename})
 
+    api_url = credentials.get_repository_base_url()
     resp = requests.post(
         f"{api_url}/api/records/{record_id}/draft/files",
         data=json.dumps(payload),
-        headers=headers,
+        headers=get_headers("application/json"),
     )
     if resp.status_code != 201:
         print(f"Could not initiate file upload: {resp.status_code} {resp.text}")
@@ -101,6 +98,7 @@ def upload_file(record_id, file_path):
     print(file_name)
 
     # Upload file content
+    api_url = credentials.get_repository_base_url()
     upload_url = f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content"
     try:
         # regular file
@@ -108,7 +106,7 @@ def upload_file(record_id, file_path):
             resp = requests.put(
                 upload_url,
                 data=f,
-                headers=headers_stream,
+                headers=get_headers("application/octet-stream"),
             )
     except UnicodeDecodeError:
         # binary file
@@ -116,7 +114,7 @@ def upload_file(record_id, file_path):
             resp = requests.put(
                 upload_url,
                 data=f,
-                headers=headers_stream,
+                headers=get_headers("application/octet-stream"),
             )
 
     if resp.status_code != 200:
@@ -126,7 +124,7 @@ def upload_file(record_id, file_path):
     # Complete draft file upload
     resp = requests.post(
         f"{api_url}/api/records/{record_id}/draft/files/{file_name}/commit",
-        headers=headers,
+        headers=get_headers("application/json"),
     )
     if resp.status_code != 200:
         print(f"Could not commit file upload: {resp.status_code} {resp.text}")
@@ -162,9 +160,10 @@ def publish_record(record_id):
 
     :param record_id: The record's id.
     """
+    api_url = credentials.get_repository_base_url()
     resp = requests.post(
         f"{api_url}/api/records/{record_id}/draft/actions/publish",
-        headers=headers,
+        headers=get_headers("application/json"),
     )
     if resp.status_code != 202:
         print(f"Could not publish record: {resp.status_code} {resp.text}")
