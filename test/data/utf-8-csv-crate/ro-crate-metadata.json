@@ -43,10 +43,7 @@
             "description": "Rainfall data for Katoomba in NSW Australia, captured February 2022.",
             "encodingFormat": "text/csv",
             "license": {
-                "@id": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-                "@type": "CreativeWork",
-                "name": "CC BY-NC-SA 4.0 International",
-                "description": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
+                "@id": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
             }
         },
         {
@@ -63,6 +60,13 @@
             "@type": "Organization",
             "name": "Example University",
             "url": "https://www.example.org"
+        },
+        {
+            "@id": "https://spdx.org/licenses/CC-BY-NC-SA-4.0.html",
+            "@type": "CreativeWork",
+            "name": "CC BY-NC-SA 4.0 International",
+            "description": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+            "identifier": "https://spdx.org/licenses/CC-BY-NC-SA-4.0.html"
         }
     ]
 }
