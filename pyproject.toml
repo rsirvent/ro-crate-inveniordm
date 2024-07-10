@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "rocrate-inveniordm"
-version = "2.0.1"
+version = "2.0.2"
 description = "Upload RO-Crates to InvenioRDM and automatically fill the metadata. Supports any InvenioRDM instance, including Zenodo."
 authors = [
     "Philipp Beer",
@@ -33,9 +33,9 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8.1"
 requests = "^2.31.0"
-python-dateutil = "2.9.0"
-python-iso639 = "^2023.6.15"
-pytz = "^2024.1"
+python-dateutil = "^2.9.0"
+python-iso639 = ">=2023.6.15"
+pytz = ">=2024.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -45,7 +45,7 @@ black = "^24.4.2"
 flake8 = "^7.1.0"
 mypy = "^1.10.1"
 types-requests = "^2.32.0.20240622"
-types-pytz = "^2024.1.0.20240417"
+types-pytz = ">=2024.1.0.20240417"
 types-python-dateutil = "^2.9.0.20240316"
 
 [tool.poetry.scripts]
