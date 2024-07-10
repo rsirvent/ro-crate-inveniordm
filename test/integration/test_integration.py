@@ -10,7 +10,7 @@ import subprocess
 
 from test.unit.utils import get_request_headers, fetch_inveniordm_record
 
-CRATES = ["minimal-ro-crate", "test-ro-crate", "real-world-example"]
+CRATES = ["minimal-ro-crate", "test-ro-crate", "real-world-example", "utf-8-csv-crate"]
 TEST_DATA_FOLDER = "test/data"
 TEST_OUTPUT_FOLDER = "test/output"
 

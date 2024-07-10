@@ -1,0 +1,76 @@
+{
+    "access": {
+        "record": "public",
+        "files": "public",
+        "embargo": {
+            "active": false
+        }
+    },
+    "metadata": {
+        "resource_type": {
+            "id": "dataset"
+        },
+        "creators": [
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "given_name": "Jane",
+                    "family_name": "Smith",
+                    "name": "Smith",
+                    "identifiers": [
+                        {
+                            "scheme": "orcid",
+                            "identifier": "0000-0000-0000-0000"
+                        }
+                    ]
+                },
+                "affiliations": [
+                    {
+                        "name": "Example University"
+                    }
+                ]
+            }
+        ],
+        "contributors": [
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "given_name": "Jane",
+                    "family_name": "Smith",
+                    "identifiers": [
+                        {
+                            "scheme": "orcid",
+                            "identifier": "0000-0000-0000-0000"
+                        }
+                    ]
+                },
+                "role": {
+                    "id": "editor"
+                },
+                "affiliations": [
+                    {
+                        "name": "Example University"
+                    }
+                ]
+            }
+        ],
+        "title": "Demo Crate",
+        "publication_date": "2024-03-08",
+        "description": "a demo crate for Galaxy training",
+        "publisher": ":unkn",
+        "rights": [
+            {
+                "title": {
+                    "en": "CC BY-NC-SA 4.0 International"
+                },
+                "description": {
+                    "en": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
+                },
+                "link": "https://spdx.org/licenses/CC-BY-NC-SA-4.0.html"
+            }
+        ]
+    },
+    "files": {
+        "enabled": true
+    }
+}

@@ -10,7 +10,7 @@ def test_get_headers():
     expected = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": f"Bearer test-key",
+        "Authorization": "Bearer test-key",
     }
 
     result = uploader.get_headers(input)

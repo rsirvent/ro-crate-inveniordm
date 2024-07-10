@@ -100,22 +100,13 @@ def upload_file(record_id, file_path):
     # Upload file content
     api_url = credentials.get_repository_base_url()
     upload_url = f"{api_url}/api/records/{record_id}/draft/files/{file_name}/content"
-    try:
-        # regular file
-        with open(file_path, "r") as f:
-            resp = requests.put(
-                upload_url,
-                data=f,
-                headers=get_headers("application/octet-stream"),
-            )
-    except UnicodeDecodeError:
-        # binary file
-        with open(file_path, "rb") as f:
-            resp = requests.put(
-                upload_url,
-                data=f,
-                headers=get_headers("application/octet-stream"),
-            )
+
+    with open(file_path, "rb") as f:
+        resp = requests.put(
+            upload_url,
+            data=f,
+            headers=get_headers("application/octet-stream"),
+        )
 
     if resp.status_code != 200:
         print(f"Could not upload file content: {resp.status_code} {resp.text}")
