@@ -18,7 +18,7 @@ def dereference(
     # if the key expects references to other entities,
     # find the referenced entity
     if key.startswith("$"):
-        return get_rc_ref(rc, entity_or_dict, key, index)
+        return get_referenced_entity(rc, entity_or_dict, key, index)
     # otherwise, use the raw value
     elif index and index != -1:
         return entity_or_dict[key][index]
@@ -90,11 +90,13 @@ def get_value_from_rc(rc, from_key, path=[]):
             if key.endswith("[]"):
                 index = path[0]
                 path = path[1:]
-                current_entity = get_rc_ref(
+                current_entity = get_referenced_entity(
                     rc, current_entity, "$" + cleaned_key, index
                 )
             else:
-                current_entity = get_rc_ref(rc, current_entity, "$" + cleaned_key)
+                current_entity = get_referenced_entity(
+                    rc, current_entity, "$" + cleaned_key
+                )
 
             if current_entity is None:
                 return None
@@ -126,7 +128,7 @@ def get_value_from_rc(rc, from_key, path=[]):
     return result
 
 
-def get_rc_ref(
+def get_referenced_entity(
     rc: dict, parent: dict, from_key: str, index: int | None = None
 ) -> dict | None:
     """
@@ -198,7 +200,7 @@ def get_rc_ref(
     return None
 
 
-def get_rc_ref_root(rc, from_key):
+def get_referenced_entity_from_root(rc, from_key):
     """
     Retrieves the entity referenced by the given $-prefixed key from the given RO-Crate.
 
@@ -208,12 +210,12 @@ def get_rc_ref_root(rc, from_key):
     """
     print(f"\t\t|- Retrieving referenced entity {from_key} from RO-Crate.")
     if from_key and not from_key.startswith("$"):
-        raise Exception(f"$-prefixed key expected, but {from_key} found.")
+        raise MappingException(f"$-prefixed key expected, but {from_key} found.")
 
     keys = from_key.split(".")
     root = rc_get_rde(rc)
     if root.get(keys[0][1:]) is None:
-        print(f"\t\t|- Key {keys[0]} not found in RO-Crate.")
+        print(f"\t\t|- Key {keys[0]} not found in RO-Crate Root Data Entity ({root["@id"]}).")
         return None
     target_entity_id = root.get(keys[0][1:]).get("@id")
     target_entity = None
