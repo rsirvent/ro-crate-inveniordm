@@ -133,7 +133,7 @@ def get_mapping_paths(rc: dict, mappings: dict) -> dict:
     return mapping_paths
 
 
-def apply_mapping(mapping, mapping_paths, rc, dc):
+def apply_mapping(mapping, mapping_paths, rc, dc):  # noqa: C901
     """Convert RO-Crate metadata to DataCite according to the specified mapping and
     paths.
 
