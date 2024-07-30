@@ -15,8 +15,6 @@ from rocrate_inveniordm.mapping.mapping_utils import (
 from rocrate_inveniordm.mapping.crate_utils import (
     dereference,
     rc_get_rde,
-    get_referenced_entity,
-    get_referenced_entity_from_root,
     get_value_from_rc,
 )
 
