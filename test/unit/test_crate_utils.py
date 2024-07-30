@@ -15,7 +15,7 @@ TEST_REFERENCING_CRATE_PATH = (
     "test/data/test-referencing-ro-crate/ro-crate-metadata.json"
 )
 
-EXPECTED_REFERENCE_ENTITIES = {
+EXPECTED_REFERENCE_ENTITIES: dict[str, dict] = {
     "license": {
         "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
         "@type": "CreativeWork",
@@ -163,7 +163,8 @@ def test_rc_get_rde():
     ],
 )
 def test_get_value_from_rc__succeeds(key: str, path: list | None, expected: dict | str):
-    """For each key and path combination, verifies that the retrieved entity matches what is expected."""
+    """For each key and path combination, verifies that the retrieved entity matches
+    what is expected."""
     rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
 
     result = cu.get_value_from_rc(rc, key, path)
@@ -171,15 +172,63 @@ def test_get_value_from_rc__succeeds(key: str, path: list | None, expected: dict
     assert result == expected
 
 
-def test_get_value_from_rc__fails():
+@pytest.mark.parametrize(
+    ["key", "path"],
+    [
+        # empty key
+        ("", []),
+        # invalid keys
+        ("test", []),
+        ("$test", []),
+        ("test[]", [0]),
+    ],
+)
+def test_get_value_from_rc__none(key, path):
     """
     ways of breaking -
     empty key
     missing path
     incorrect path format
+    invalid key
     """
-    # TODO
-    rc = load_template_rc(MINIMAL_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
+
+    result = cu.get_value_from_rc(rc, key, path)
+
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    ["key", "path", "expected_error", "expected_message"],
+    [
+        # invalid key
+        (
+            "$test[]",
+            [0],
+            ValueError,
+            "Value of $test is not a list, but an index was provided.",
+        ),
+        # invalid index / path format
+        ("author[]", [], IndexError, "out of range"),
+        ("$author[]", [], IndexError, "out of range"),
+        ("author[]", [2], IndexError, "out of range"),
+        ("$author[]", [2], IndexError, "out of range"),
+        ("$author[]", ["value"], TypeError, "list indices must be integers or slices"),
+        ("$author[]", "value", TypeError, "list indices must be integers or slices"),
+    ],
+)
+def test_get_value_from_rc__error(key, path, expected_error, expected_message):
+    """
+    ways of breaking -
+    empty key
+    missing path
+    incorrect path format
+    invalid key
+    """
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
+
+    with pytest.raises(expected_error, match=re.escape(expected_message)):
+        cu.get_value_from_rc(rc, key, path)
 
 
 def test_get_referenced_entity__direct():
