@@ -78,15 +78,15 @@
         },
         {
             "@id": "https://ror.org/04d836q62",
-            "@type": "Organization",
-            "name": "TU Wien"
-        },
-        {
-            "@id": "https://www.idrc.ca/",
             "@type": [
                 "Organization",
                 "CollegeOrUniversity"
             ],
+            "name": "TU Wien"
+        },
+        {
+            "@id": "https://www.idrc.ca/",
+            "@type": "Organization",
             "description": "Canadian Frown Corporation and funder of development research",
             "identifier": "IDRC",
             "name": "International Development Research Center"

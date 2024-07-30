@@ -40,7 +40,7 @@ EXPECTED_REFERENCE_ENTITIES = {
     },
     "publisher": {
         "@id": "https://ror.org/04d836q62",
-        "@type": "Organization",
+        "@type": ["Organization", "CollegeOrUniversity"],
         "name": "TU Wien",
     },
 }
@@ -112,35 +112,49 @@ def test_rc_get_rde():
 @pytest.mark.parametrize(
     ["key", "path", "expected"],
     [
+        # # single-part key
+        # string
         ("datePublished", [], "2023-02-02"),
+        # entity
         ("$license", [], EXPECTED_REFERENCE_ENTITIES["license"]),
+        # array item - string
         ("encodingFormat[]", [1], "text/plain"),
+        # whole array
+        ("encodingFormat[]", [-1], ["text/csv", "text/plain"]),
+        # array item - entity
         ("$author[]", [1], EXPECTED_REFERENCE_ENTITIES["author"]),
+        # # multiple-part key
+        # property on entity
         (
             "$license.name",
             [],
             EXPECTED_REFERENCE_ENTITIES["license"]["name"],
         ),
+        # property on entity within array
         (
             "$author[].givenName",
             [1],
             EXPECTED_REFERENCE_ENTITIES["author"]["givenName"],
         ),
+        # entity referenced by entity within array
         (
             "$author[].$affiliation",
             [1],
             EXPECTED_REFERENCE_ENTITIES["publisher"],
         ),
+        # array element within property on entity
         (
             "$publisher.@type[]",
             [1],
             "CollegeOrUniversity",
         ),
+        # nested arrays - multiple-step path
         (
             "$contentLocation[].@type[]",
             [0, 1],
             "Park",
         ),
+        # # three-step key
         (
             "$author[].$affiliation.name",
             [1],
@@ -149,7 +163,7 @@ def test_rc_get_rde():
     ],
 )
 def test_get_value_from_rc__succeeds(key: str, path: list | None, expected: dict | str):
-    """ """
+    """For each key and path combination, verifies that the retrieved entity matches what is expected."""
     rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
 
     result = cu.get_value_from_rc(rc, key, path)
