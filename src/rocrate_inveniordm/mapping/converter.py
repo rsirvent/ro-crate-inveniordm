@@ -188,7 +188,8 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
             # If the value is a JSON object, then we ignore the rule (since another rule
             # must be implemented on how to handle it)
             print(
-                f"\t\t|- Result is a JSON object, so this rule cannot be applied. Skipping to next rule."
+                "\t\t|- Result is a JSON object, so this rule cannot be applied. "
+                "Skipping to next rule."
             )
             from_value = None
 

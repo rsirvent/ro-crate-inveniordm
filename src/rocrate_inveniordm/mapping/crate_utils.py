@@ -210,7 +210,10 @@ def get_referenced_entity_from_root(rc, from_key):
     keys = from_key.split(".")
     root = rc_get_rde(rc)
     if root.get(keys[0][1:]) is None:
-        print(f"\t\t|- Key {keys[0]} not found in RO-Crate Root Data Entity ({root["@id"]}).")
+        print(
+            f"\t\t|- Key {keys[0]} not found in RO-Crate Root Data Entity "
+            f'({root["@id"]}).'
+        )
         return None
     target_entity_id = root.get(keys[0][1:]).get("@id")
     target_entity = None
