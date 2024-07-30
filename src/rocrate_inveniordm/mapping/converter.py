@@ -184,6 +184,14 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
         new_path = path.copy()
         from_value = get_value_from_rc(rc.copy(), from_mapping_value, new_path)
 
+        if from_value and isinstance(from_value, dict):
+            # If the value is a JSON object, then we ignore the rule (since another rule
+            # must be implemented on how to handle it)
+            print(
+                f"\t\t|- Result is a JSON object, so this rule cannot be applied. Skipping to next rule."
+            )
+            from_value = None
+
         # if (from_value is None):
         #    continue
 

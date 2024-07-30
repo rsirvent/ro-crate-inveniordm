@@ -120,11 +120,6 @@ def get_value_from_rc(rc, from_key, path=[]):
 
     print(f"\t\t|- Value for key {from_key} is {result}")
 
-    if result and isinstance(result, dict):
-        # If the value is a JSON object, then we ignore the rule (since another rule
-        # must be implemented on how to handle it)
-        return None
-
     return result
 
 
