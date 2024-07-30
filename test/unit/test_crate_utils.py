@@ -11,6 +11,39 @@ from test.unit.utils import (
 
 MINIMAL_CRATE_PATH = "test/data/minimal-ro-crate/ro-crate-metadata.json"
 TEST_CRATE_PATH = "test/data/test-ro-crate/ro-crate-metadata.json"
+TEST_REFERENCING_CRATE_PATH = (
+    "test/data/test-referencing-ro-crate/ro-crate-metadata.json"
+)
+
+EXPECTED_REFERENCE_ENTITIES = {
+    "license": {
+        "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
+        "@type": "CreativeWork",
+        "description": (
+            "This work is licensed under the Creative Commons "
+            "Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a "
+            "copy of this license, visit "
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to "
+            "Creative Commons, PO Box 1866, Mountain View, CA 94042, USA."
+        ),
+        "identifier": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
+        "name": (
+            "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
+        ),
+    },
+    "author": {
+        "@id": "https://orcid.org/0009-0001-3915-5910",
+        "@type": "Person",
+        "givenName": "Milan",
+        "familyName": "Szente",
+        "affiliation": {"@id": "https://ror.org/04d836q62"},
+    },
+    "publisher": {
+        "@id": "https://ror.org/04d836q62",
+        "@type": "Organization",
+        "name": "TU Wien",
+    },
+}
 
 
 def test_dereference_string():
@@ -26,21 +59,7 @@ def test_dereference_string():
 def test_dereference_entity():
     rc = load_template_rc(MINIMAL_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
-    expected = {
-        "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-        "@type": "CreativeWork",
-        "description": (
-            "This work is licensed under the Creative Commons "
-            "Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a "
-            "copy of this license, visit "
-            "http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to "
-            "Creative Commons, PO Box 1866, Mountain View, CA 94042, USA."
-        ),
-        "identifier": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-        "name": (
-            "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
-        ),
-    }
+    expected = EXPECTED_REFERENCE_ENTITIES["license"]
 
     result = cu.dereference(rc, rde, "$license")
 
@@ -60,13 +79,7 @@ def test_dereference_string_array_item():
 def test_dereference_entity_array_item():
     rc = load_template_rc(TEST_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
-    expected = {
-        "@id": "https://orcid.org/0009-0001-3915-5910",
-        "@type": "Person",
-        "givenName": "Milan",
-        "familyName": "Szente",
-        "affiliation": {"@id": "https://ror.org/04d836q62"},
-    }
+    expected = EXPECTED_REFERENCE_ENTITIES["author"]
 
     result = cu.dereference(rc, rde, "$author", 1)
 
@@ -96,7 +109,61 @@ def test_rc_get_rde():
     assert result == expected
 
 
-def test_get_value_from_rc():
+@pytest.mark.parametrize(
+    ["key", "path", "expected"],
+    [
+        ("datePublished", [], "2023-02-02"),
+        ("$license", [], EXPECTED_REFERENCE_ENTITIES["license"]),
+        ("encodingFormat[]", [1], "text/plain"),
+        ("$author[]", [1], EXPECTED_REFERENCE_ENTITIES["author"]),
+        (
+            "$license.name",
+            [],
+            EXPECTED_REFERENCE_ENTITIES["license"]["name"],
+        ),
+        (
+            "$author[].givenName",
+            [1],
+            EXPECTED_REFERENCE_ENTITIES["author"]["givenName"],
+        ),
+        (
+            "$author[].$affiliation",
+            [1],
+            EXPECTED_REFERENCE_ENTITIES["publisher"],
+        ),
+        (
+            "$publisher.@type[]",
+            [1],
+            "CollegeOrUniversity",
+        ),
+        (
+            "$contentLocation[].@type[]",
+            [0, 1],
+            "Park",
+        ),
+        (
+            "$author[].$affiliation.name",
+            [1],
+            EXPECTED_REFERENCE_ENTITIES["publisher"]["name"],
+        ),
+    ],
+)
+def test_get_value_from_rc__succeeds(key: str, path: list | None, expected: dict | str):
+    """ """
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
+
+    result = cu.get_value_from_rc(rc, key, path)
+
+    assert result == expected
+
+
+def test_get_value_from_rc__fails():
+    """
+    ways of breaking -
+    empty key
+    missing path
+    incorrect path format
+    """
     # TODO
     rc = load_template_rc(MINIMAL_CRATE_PATH)
 
