@@ -33,9 +33,9 @@ def get_arrays_from_from_values(input_list: list) -> list:
     fields.
 
     For example, the from-value "$author[].name" relates to the "name" property within
-    any entity which is listed as an "author" of another entity. In this case, the
-    referencing "author" value may be a string or an array, and may reference other
-    entities in the RO-Crate.
+    any entity which is listed as an "author" of another entity. The $ indicates a
+    cross-reference, and the [] indicates that the "author" property may be a dict or
+    an array.
 
     :param input_list: A list of from-values.
     :return: A list of paths which include arrays.

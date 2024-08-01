@@ -245,7 +245,7 @@ def get_paths_recursive(
 
     :param rc: Dictionary containing the RO-Crate metadata to find paths in
     :param entity_or_dict: The RO-Crate entity or regular dictionary which contains the
-        first key in the list
+        first key in the list. If a non-dict is provided, returns None.
     :param keys: A list of keys. Each key should represent a dict or reference to an
         entity which contains the next key in the list, except the final key which may
         represent anything. e.g. ["$author[]", "name"]
