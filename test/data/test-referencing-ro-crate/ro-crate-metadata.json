@@ -1,0 +1,103 @@
+{
+    "@context": "https://w3id.org/ro/crate/1.1/context",
+    "@graph": [
+        {
+            "@type": "CreativeWork",
+            "@id": "ro-crate-metadata.json",
+            "conformsTo": {
+                "@id": "https://w3id.org/ro/crate/1.1"
+            },
+            "about": {
+                "@id": "./"
+            }
+        },
+        {
+            "@id": "./",
+            "identifier": "https://doi.org/10.4225/59/59672c09f4a4b",
+            "@type": "Dataset",
+            "datePublished": "2023-02-02",
+            "name": "Measuring execution time of different CUDA libraries",
+            "description": "Measuring execution time of Boost.Compute, Thrust and ViennaCL libraries",
+            "license": {
+                "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/"
+            },
+            "keywords": [
+                "RO-Crate"
+            ],
+            "author": [
+                {
+                    "@id": "https://orcid.org/0009-0009-6923-0027"
+                },
+                {
+                    "@id": "https://orcid.org/0009-0001-3915-5910"
+                }
+            ],
+            "publisher": {
+                "@id": "https://ror.org/04d836q62"
+            },
+            "encodingFormat": [
+                "text/csv",
+                "text/plain"
+            ],
+            "inLanguage": "en",
+            "version": "v5.3.8",
+            "funder": {
+                "@id": "https://www.idrc.ca/"
+            },
+            "contentLocation": [
+                {
+                    "@id": "http://sws.geonames.org/8152662/"
+                }
+            ],
+            "temporalCoverage": "2018"
+        },
+        {
+            "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
+            "@type": "CreativeWork",
+            "description": "This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.",
+            "identifier": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
+            "name": "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
+        },
+        {
+            "@id": "https://orcid.org/0009-0009-6923-0027",
+            "@type": "Person",
+            "givenName": "Philipp",
+            "familyName": "Beer",
+            "affiliation": {
+                "@id": "https://ror.org/04d836q62"
+            }
+        },
+        {
+            "@id": "https://orcid.org/0009-0001-3915-5910",
+            "@type": "Person",
+            "givenName": "Milan",
+            "familyName": "Szente",
+            "affiliation": {
+                "@id": "https://ror.org/04d836q62"
+            }
+        },
+        {
+            "@id": "https://ror.org/04d836q62",
+            "@type": [
+                "Organization",
+                "CollegeOrUniversity"
+            ],
+            "name": "TU Wien"
+        },
+        {
+            "@id": "https://www.idrc.ca/",
+            "@type": "Organization",
+            "description": "Canadian Frown Corporation and funder of development research",
+            "identifier": "IDRC",
+            "name": "International Development Research Center"
+        },
+        {
+            "@id": "http://sws.geonames.org/8152662/",
+            "@type": [
+                "Place",
+                "Park"
+            ],
+            "name": "Catalina Park"
+        }
+    ]
+}

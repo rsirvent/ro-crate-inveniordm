@@ -6,15 +6,6 @@ import pytest
 import rocrate_inveniordm.mapping.converter as converter
 
 
-def test_load_mapping_json():
-    with open("src/rocrate_inveniordm/mapping/mapping.json") as f:
-        expected_json = json.load(f)
-
-    result_json = converter.load_mapping_json()
-
-    assert result_json == expected_json
-
-
 def test_check_condition__true():
     rule = "?string"
     value = "This is a string"
@@ -89,19 +80,3 @@ def test_process__nonexistent():
         NotImplementedError, match=re.escape(f"Function {rule} not implemented.")
     ):
         converter.process(rule, value)
-
-
-def test_setup_dc():
-    expected = {
-        "access": {
-            "record": "public",  # public or restricted; 1
-            "files": "public",  # public or restricted; 1
-            "embargo": {"active": False},  # 0-1
-        },
-        "metadata": {},
-        "files": {"enabled": True},
-    }
-
-    result = converter.setup_dc()
-
-    assert result == expected

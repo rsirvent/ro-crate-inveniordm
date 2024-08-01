@@ -1,10 +1,22 @@
 import json
 import sys
-from importlib import resources
-import rocrate_inveniordm.mapping as mapping
 
 import rocrate_inveniordm.mapping.condition_functions as cf
 import rocrate_inveniordm.mapping.processing_functions as pf
+from rocrate_inveniordm.mapping.mapping_utils import (
+    MappingException,
+    load_mapping_json,
+    get_arrays_from_from_values,
+    contains_atatthis,
+    clean_key,
+    format_value,
+    setup_dc,
+)
+from rocrate_inveniordm.mapping.crate_utils import (
+    dereference,
+    rc_get_rde,
+    get_value_from_rc,
+)
 
 
 def main():
@@ -28,32 +40,13 @@ def main():
     return
 
 
-def get_arrays_from_from_values(input_list):
-    output_set = set()
-    for string in input_list:
-        delimiter_index = string.rfind("[]")
-        if delimiter_index != -1:
-            processed_string = string[
-                : delimiter_index + 2
-            ]  # Include the "[]" in the output
-            output_set.add(processed_string)
-    output_list = list(output_set)
-    return output_list
-
-
-def load_mapping_json() -> dict:
-    mapping_file = resources.files(mapping) / "mapping.json"
-    with mapping_file.open("r") as f:
-        mapping_json = json.load(f)
-    return mapping_json
-
-
-def convert(rc, metadata_only=False):
+def convert(rc: dict, metadata_only: bool = False) -> dict:
     """
     Convert a RO-Crate to a DataCite object
 
     :param rc: The RO-Crate
     :param metadata_only: Whether it is a metadata-only DataCite
+    :return: Dictionary containing DataCite metadata
     """
 
     m = load_mapping_json()
@@ -63,7 +56,10 @@ def convert(rc, metadata_only=False):
         dc["files"]["enabled"] = False
     print(dc)
 
-    root_rules = m.get("$root")
+    try:
+        root_rules = m["$root"]
+    except KeyError:
+        raise MappingException("Mapping does not contain a '$root' key.")
 
     for mapping_class in root_rules:
         print()
@@ -105,11 +101,24 @@ def convert(rc, metadata_only=False):
     return dc
 
 
-def get_mapping_paths(rc, mappings):
+def get_mapping_paths(rc: dict, mappings: dict) -> dict:
+    """Get the RO-Crate metadata paths relating to a set of mappings.
+    A path is a location within the RO-Crate metadata where data relating to a
+    particular mapping can be found. For example, the "creators_mapping" mapping looks
+    for the "author" property on entities within the RO-Crate.
+
+    :param rc: The RO-Crate metadata to find paths in
+    :param mappings: A dictionary containing mapping classes
+    :raises MappingException: Something is wrong with the loaded mapping
+    :return: A dictionary with mapping classes as keys and relevant paths as values
+    """
+
     # retrieve all array values
     all_from_values = []
     for key in mappings:
         mapping = mappings.get(key)
+        if not isinstance(mapping, dict):
+            raise MappingException(f"Mapping key {key} does not map to a dictionary.")
         from_value = mapping.get("from")
         if from_value is not None:
             all_from_values.append(from_value)
@@ -124,7 +133,26 @@ def get_mapping_paths(rc, mappings):
     return mapping_paths
 
 
-def apply_mapping(mapping, mapping_paths, rc, dc):
+def apply_mapping(mapping, mapping_paths, rc, dc):  # noqa: C901
+    """Convert RO-Crate metadata to DataCite according to the specified mapping and
+    paths.
+
+    The following steps are performed for each defined mapping:
+    1. Get the value from the RO-Crate (from)
+    2. Check if the rule should be applied (onlyIf)
+    3. Process the value (processing)
+    4. Put the value into the correct format (value)
+    5. Add the value to the DataCite object (to)
+
+
+    :param mapping: Dictionary describing how to map a particular RO-Crate field to
+        DataCite
+    :param mapping_paths: A list of paths, used to disambiguate array values
+    :param rc: Dictionary of RO-Crate metadata
+    :param dc: Dictionary of DataCite metadata
+    :return: tuple containing the updated dictionary of DataCite metadata, and a boolean
+        indicating whether the rule was applied
+    """
     rule_applied = False
 
     if "_ignore" in mapping.keys():
@@ -135,13 +163,6 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
     value_mapping_value = mapping.get("value")
     processing_mapping_value = mapping.get("processing")
     only_if_value = mapping.get("onlyIf")
-
-    # The following steps are performed:
-    # 1. Get the value from the RO-Crate (from)
-    # 2. Check if the rule should be applied (onlyIf)
-    # 3. Process the value (processing)
-    # 4. Put the value into the correct format (value)
-    # 5. Add the value to the DataCite object (to)
 
     # Get the correct mapping paths. change this. now it is overriden
     paths = [[]]
@@ -159,7 +180,16 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
     for path in paths:
         print(f"PATH: {path}")
         new_path = path.copy()
-        from_value = get_rc(rc.copy(), from_mapping_value, new_path)
+        from_value = get_value_from_rc(rc.copy(), from_mapping_value, new_path)
+
+        if from_value and isinstance(from_value, dict):
+            # If the value is a JSON object, then we ignore the rule (since another rule
+            # must be implemented on how to handle it)
+            print(
+                "\t\t|- Result is a JSON object, so this rule cannot be applied. "
+                "Skipping to next rule."
+            )
+            from_value = None
 
         # if (from_value is None):
         #    continue
@@ -177,7 +207,8 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
 
         if from_value is not None:
             print(
-                f"\t\t|- Adding {from_value} to {to_mapping_value} with path {path.copy()}"
+                f"\t\t|- Adding {from_value} to {to_mapping_value} with path "
+                f"{path.copy()}"
             )
             rule_applied = True
             print(dc, to_mapping_value, from_value)
@@ -186,123 +217,94 @@ def apply_mapping(mapping, mapping_paths, rc, dc):
     return dc, rule_applied
 
 
-def get_paths(rc, key):
+def get_paths(rc: dict, key: str) -> list[list]:
     """
     Get all possible paths for a given key
 
     :param rc: The RO-Crate
     :param key: The key to get the paths for
+    :return: A list of lists, where each list represents a path
     """
     print(f"\t\t|- Getting paths for {key}")
     keys = key.split(".")
     temp = rc_get_rde(rc)
-    paths = []
+    paths: list[list] = []
     get_paths_recursive(rc, temp, keys, paths, [])
     print(f"\t\t\t|- Found paths {paths}")
     return paths
 
 
-def get_paths_recursive(rc, temp, keys, paths, path):
+def get_paths_recursive(
+    rc: dict,
+    entity_or_dict: dict | str | int | float | None,
+    keys: list[str],
+    paths: list,
+    path: list,
+):
+    """Recursively find paths within an RO-Crate for a list of keys.
 
+    :param rc: Dictionary containing the RO-Crate metadata to find paths in
+    :param entity_or_dict: The RO-Crate entity or regular dictionary which contains the
+        first key in the list. If a non-dict is provided, returns None.
+    :param keys: A list of keys. Each key should represent a dict or reference to an
+        entity which contains the next key in the list, except the final key which may
+        represent anything. e.g. ["$author[]", "name"]
+    :param paths: Current list of known paths (modified in place)
+    :param path: List of components of the current path, e.g. ["author",1,"name"]
+    """
+
+    # end of the recursive chain
     if len(keys) == 0:
         paths.append(path)
         return
 
     current_key = keys[0]
 
-    # clean key
-    cleaned_key = current_key
-    cleaned_key = cleaned_key.replace("[]", "").replace("$", "")
-    if temp is None:
-        return
-    if cleaned_key not in temp.keys():
+    # clean key and check it is in the current entity
+    cleaned_key = clean_key(current_key)
+    if (
+        entity_or_dict is None
+        or not isinstance(entity_or_dict, dict)
+        or cleaned_key not in entity_or_dict.keys()
+    ):
         return
 
+    # if the key indicates that it may be an array, get paths for every element in the
+    # array
     if current_key.endswith("[]"):
         new_current_key = current_key
         if current_key.startswith("$"):
             new_current_key = current_key[1:]
-        if isinstance(temp[new_current_key[:-2]], list):
-            for i in range(len(temp[new_current_key[:-2]])):
+        value = entity_or_dict[new_current_key[:-2]]
+        # if value for this key is a list, get paths recursively for each item
+        if isinstance(value, list):
+            for i in range(len(value)):
                 new_path = path.copy()
                 new_path.append(i)
-                if current_key.startswith("$"):
-                    new_temp = get_rc_ref(rc, temp, current_key[:-2], i)
-                else:
-                    new_temp = temp[new_current_key[:-2]][i]
 
+                new_temp = dereference(rc, entity_or_dict, current_key[:-2], i)
+
+                # find paths within the next entity/dict using subsequent keys in the
+                # list
                 get_paths_recursive(rc, new_temp, keys[1:], paths, new_path)
+
+        # value is not a list
         else:
             new_path = path.copy()
-            new_path.append(-1)
-            if current_key.startswith("$"):
-                new_temp = get_rc_ref(rc, temp, current_key[:-2])
-            else:
-                new_temp = temp[current_key[:-2]]
+            new_path.append(-1)  # indicate we are not navigating a list
+            new_temp = dereference(rc, entity_or_dict, current_key[:-2])
 
+            # find parts within the next entity/dict using subsequent keys in the list
             get_paths_recursive(rc, new_temp, keys[1:], paths, new_path)
+
+    # key is not for an array
     else:
-        if current_key == "$":
-            temp = get_rc_ref(rc, temp, current_key)
-        else:
-            temp = temp[current_key]
-        get_paths_recursive(rc, temp, keys[1:], paths, path)
+        entity_or_dict = dereference(rc, entity_or_dict, current_key)
+
+        # find parts within the next entity/dict using subsequent keys in the list
+        get_paths_recursive(rc, entity_or_dict, keys[1:], paths, path)
 
     return
-
-
-def rc_get_rde(rc):
-    """
-    Retrieves the Root Date Entity from the given RO-Crate.
-
-    :param rc: The RO-Crate to retrieve the RDE from.
-    :return: The Root Data Entity of the given RO-Crate.
-    """
-
-    # Following the RO-Crate specification (https://www.researchobject.org/ro-crate/1.1/root-data-entity.html),
-    # use the following algorithm to find the RDE:
-    #
-    # For each entity in @graph array
-    #   if the conformsTo property is a URI that starts with https://w3id.org/ro/crate/
-    #       from this entity's about object keep the @id URI as variable root
-    # For each entity in @graph array
-    #   if the entity has an @id URI that matches the root return it
-
-    root = None
-    graph = rc.get("@graph")
-    for entity in graph:
-        conformsTo = entity.get("conformsTo")
-        if (
-            conformsTo
-            and conformsTo.get("@id")
-            and conformsTo.get("@id").startswith("https://w3id.org/ro/crate/")
-        ):
-            root = entity.get("about").get("@id")
-
-    for entity in graph:
-        if entity.get("@id") == root:
-            return entity
-
-
-def contains_atatthis(value):
-    """
-    Checks if the given value contains the string "@@this".
-    The value can be a string or a dictionary.
-
-    :param value: The value to check.
-    :return: True if the value contains "@@this", False otherwise.
-    """
-    if isinstance(value, str):
-        return "@@this" in value
-    elif isinstance(value, dict):
-        for key, v in value.items():
-            if isinstance(v, str):
-                if "@@this" in v:
-                    return True
-            else:
-                return contains_atatthis(value[key])
-
-    return False
 
 
 def transform_to_target_format(format, value):
@@ -325,181 +327,6 @@ def transform_to_target_format(format, value):
             return format
         print(f"\t\t|- Formatted value {value} is {format}")
     return format
-
-
-def get_rc(rc, from_key, path=[]):
-    """
-    Retrieves the value of the given key from the given RO-Crate.
-    A key consists of multiple subkeys, separated by a dot (.).
-    If a subkey starts with a $, then it is a reference to another key.
-
-    :param rc: The RO-Crate to retrieve the value from.
-    :param from_key: The key to retrieve the value from.
-    :return: The value of the given key in the given RO-Crate.
-    """
-    result = None
-
-    if not from_key:
-        return None
-
-    print(f"\t\t|- Retrieving value {from_key} with path {path} from RO-Crate.")
-    keys = from_key.split(".")
-    print(keys)
-    temp = rc_get_rde(rc)
-
-    for key in keys:
-        cleaned_key = key.replace("[]", "").replace("$", "")
-        print(f"\t\t|- Cleaned key: {cleaned_key}")
-        if key.startswith("$"):
-            # we need to dereference the key
-            index = None
-            if key.endswith("[]"):
-                index = path[0]
-                path = path[1:]
-                if index == -1:
-                    temp = get_rc_ref(rc, temp, "$" + cleaned_key)
-                else:
-                    temp = get_rc_ref(rc, temp, "$" + cleaned_key, index)
-            else:
-                temp = get_rc_ref(rc, temp, "$" + cleaned_key)
-
-            if temp is None:
-                return None
-
-        elif cleaned_key not in temp.keys():
-            # The key could not be found in the RO-Crate
-            return None
-
-        else:
-            if key.endswith("[]"):
-                index = path[0]
-                path = path[1:]
-                if index == -1:
-                    temp = temp.get(cleaned_key)
-                else:
-                    temp = temp.get(cleaned_key)[index]
-            else:
-                temp = temp.get(cleaned_key)
-
-    result = temp
-
-    print(f"\t\t|- Value for key {from_key} is {result}")
-
-    if result and isinstance(result, dict):
-        # If the value is a JSON object, then we ignore the rule (since another rule must be implemented on how to handle it)
-        return None
-
-    return result
-
-
-def get_rc_ref(rc, parent, from_key, index=None):
-    """
-    Retrieves the entity referenced by the given $-prefixed key from the given RO-Crate.
-
-    Example: Calling get_rc_ref(rc, parent, "$affiliation") on the following RO-Crate
-
-    rc: {
-        ...
-        {
-            "@id": "https://orcid.org/0000-0002-8367-6908",
-            "@type": "Person",
-            "name": "J. Xuan"
-            "affiliation": {"@id": "https:/abc"}
-        }
-        {
-            "@id": "https:/abc",
-            "@type": "Organization",
-            "name": "ABC University"
-        }
-    }
-
-    parent: {
-            "@id": "https://orcid.org/0000-0002-8367-6908",
-            "@type": "Person",
-            "name": "J. Xuan"
-            "affiliation": {"@id": "https:/abc"}
-        }
-
-    returns {
-            "@id": "https:/abc",
-            "@type": "Organization",
-            "name": "ABC University"
-        }
-    """
-    print(f"\t\t|- Retrieving referenced entity {from_key} from RO-Crate.")
-    if from_key and not from_key.startswith("$"):
-        raise Exception(f"$-prefixed key expected, but {from_key} found.")
-    id_val = parent.get(from_key[1:])
-    if isinstance(id_val, list):
-        id_val = id_val[index]
-    if isinstance(id_val, dict):
-        id = id_val.get("@id")
-        print(f"\t\t\t|- Id is {id}")
-    else:
-        return None
-
-    for entity in rc.get("@graph"):
-        if entity.get("@id") == id:
-            print(f"\t\t\t|- Found entity {entity}")
-            return entity
-
-    return None
-
-
-def get_rc_ref_root(rc, from_key):
-    """
-    Retrieves the entity referenced by the given $-prefixed key from the given RO-Crate.
-
-    :param rc: The RO-Crate to retrieve the referenced entity from.
-    :param from_key: The $-prefixed key to retrieve the referenced entity from.
-    :return: The referenced entity of the given RO-Crate.
-    """
-    print(f"\t\t|- Retrieving referenced entity {from_key} from RO-Crate.")
-    if from_key and not from_key.startswith("$"):
-        raise Exception(f"$-prefixed key expected, but {from_key} found.")
-
-    keys = from_key.split(".")
-    root = rc_get_rde(rc)
-    if root.get(keys[0][1:]) is None:
-        print(f"\t\t|- Key {keys[0]} not found in RO-Crate.")
-        return None
-    target_entity_id = root.get(keys[0][1:]).get("@id")
-    target_entity = None
-
-    for entity in rc.get("@graph"):
-        if entity.get("@id") == target_entity_id:
-            target_entity = entity
-            break
-    return target_entity
-
-
-def format_value(format, value):
-    """
-    Formats the given value according to the given format.
-    The format can be a string or a dictionary.
-    If the format is a string, the value is inserted at the position of @@this.
-    If the format is a dictionary, the value is inserted at the position of @@this in each value of the dictionary.
-
-    For example, if the format is {"a": "@@this", "b": "c"}, and the value is "d", the result is {"a": "d", "b": "c"}.
-
-    :param format: The format to use.
-    :param value: The value to insert.
-    :return: The formatted value.
-    """
-    if isinstance(format, str):
-        return format.replace("@@this", value)
-    elif isinstance(format, dict):
-        # format = {}
-        for key, v in format.items():
-            format[key] = format_value(v, value)
-        return format
-    elif isinstance(format, bool):
-        return format
-    else:
-
-        raise TypeError(
-            f"Format must be a string, dictionary, or bool, but is {type(format)}."
-        )
 
 
 def set_dc(dictionary, key, value=None, path=[]):
@@ -559,7 +386,8 @@ def set_dc(dictionary, key, value=None, path=[]):
 def check_condition(condition_rule, value):
     """
     Checks if a value matches a condition rule.
-    The condition rule is a string that starts with ? and is followed by the name of the function to apply.
+    The condition rule is a string that starts with ? and is followed by the name of the
+    function to apply.
     The function must be defined in condition_functions.py.
 
     :param condition_rule: The condition rule to apply.
@@ -578,7 +406,8 @@ def check_condition(condition_rule, value):
 def process(process_rule, value):
     """
     Processes a value according to a processing rule.
-    The processing rule is a string that starts with $ and is followed by the name of the function to apply.
+    The processing rule is a string that starts with $ and is followed by the name of
+    the function to apply.
     The function must be defined in processing_functions.py.
 
     :param process_rule: The processing rule to apply.
@@ -592,20 +421,6 @@ def process(process_rule, value):
     except AttributeError:
         raise NotImplementedError(f"Function {process_rule} not implemented.")
     return function(value)
-
-
-def setup_dc():
-    # https://inveniordm.docs.cern.ch/reference/metadata/#metadata
-    dc = {
-        "access": {
-            "record": "public",  # public or restricted; 1
-            "files": "public",  # public or restricted; 1
-            "embargo": {"active": False},  # 0-1
-        },
-        "metadata": {},
-        "files": {"enabled": True},
-    }
-    return dc
 
 
 if __name__ == "__main__":

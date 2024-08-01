@@ -6,7 +6,7 @@ import pathlib
 import re
 import requests
 import shutil
-import subprocess
+from subprocess import check_output, CalledProcessError, STDOUT
 
 from test.unit.utils import get_request_headers, fetch_inveniordm_record
 
@@ -31,20 +31,28 @@ def test_created_datacite_files(crate_name):
     output_file = "datacite-out.json"
 
     # Act
-    # note - check_output raises CalledProcessError if exit code is non-zero
-    # --no-upload prevents upload and generates DataCite files only
-    log = subprocess.check_output(
-        f"rocrate_inveniordm {crate_path} --no-upload", shell=True, text=True
-    )
-    # preserve data files and log in TEST_OUTPUT_FOLDER
+    try:
+        # note - check_output raises CalledProcessError if exit code is non-zero
+        # --no-upload prevents upload and generates DataCite files only
+        log = check_output(
+            f"rocrate_inveniordm {crate_path} --no-upload",
+            shell=True,
+            text=True,
+            stderr=STDOUT,
+        )
+    except CalledProcessError as e:
+        log = e.output
+    finally:
+        # always preserve log in TEST_OUTPUT_FOLDER
+        with open(
+            os.path.join(TEST_OUTPUT_FOLDER, f"log-datacite-{crate_name}.txt"),
+            "w",
+        ) as log_file:
+            log_file.write(log)
+    # if successful, preserve DataCite output
     shutil.copyfile(
         output_file, os.path.join(TEST_OUTPUT_FOLDER, f"datacite-out-{crate_name}.json")
     )
-    with open(
-        os.path.join(TEST_OUTPUT_FOLDER, f"log-datacite-{crate_name}.txt"),
-        "w",
-    ) as log_file:
-        log_file.write(log)
 
     # Assert
     assert "Created datacite-out.json, skipping upload" in log
@@ -65,15 +73,19 @@ def test_created_invenio_records(crate_name):
     expected_log_pattern = r"^Successfully created record (?P<id>[0-9]*)$"
 
     # Act
-    # note - check_output raises CalledProcessError if exit code is non-zero
-    log = subprocess.check_output(
-        f"rocrate_inveniordm {crate_path}", shell=True, text=True
-    )
-    with open(
-        os.path.join(TEST_OUTPUT_FOLDER, f"log-upload-{crate_name}.txt"),
-        "w",
-    ) as log_file:
-        log_file.write(log)
+    try:
+        # note - check_output raises CalledProcessError if exit code is non-zero
+        log = check_output(
+            f"rocrate_inveniordm {crate_path}", shell=True, text=True, stderr=STDOUT
+        )
+    except CalledProcessError as e:
+        log = e.output
+    finally:
+        with open(
+            os.path.join(TEST_OUTPUT_FOLDER, f"log-upload-{crate_name}.txt"),
+            "w",
+        ) as log_file:
+            log_file.write(log)
     match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
     record_id = match.group("id")
 
@@ -121,8 +133,8 @@ def test_cli__zip():
 
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
-    log = subprocess.check_output(
-        f"rocrate_inveniordm {crate_path} -z", shell=True, text=True
+    log = check_output(
+        f"rocrate_inveniordm {crate_path} -z", shell=True, text=True, stderr=STDOUT
     )
     match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
     record_id = match.group("id")
@@ -158,8 +170,11 @@ def test_cli__datacite():
 
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
-    log = subprocess.check_output(
-        f"rocrate_inveniordm {crate_path} -d {compare_path}", shell=True, text=True
+    log = check_output(
+        f"rocrate_inveniordm {crate_path} -d {compare_path}",
+        shell=True,
+        text=True,
+        stderr=STDOUT,
     )
     match = re.search(expected_log_pattern_2, log, flags=re.MULTILINE)
     record_id = match.group("id")
@@ -185,8 +200,8 @@ def test_cli__omit_roc_files():
 
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
-    log = subprocess.check_output(
-        f"rocrate_inveniordm {crate_path} -o", shell=True, text=True
+    log = check_output(
+        f"rocrate_inveniordm {crate_path} -o", shell=True, text=True, stderr=STDOUT
     )
     match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
     record_id = match.group("id")
@@ -214,8 +229,8 @@ def test_cli__publish():
 
     # Act
     # note - check_output raises CalledProcessError if exit code is non-zero
-    log = subprocess.check_output(
-        f"rocrate_inveniordm {crate_path} -p", shell=True, text=True
+    log = check_output(
+        f"rocrate_inveniordm {crate_path} -p", shell=True, text=True, stderr=STDOUT
     )
     match = re.search(expected_log_pattern, log, flags=re.MULTILINE)
     record_id = match.group("id")

@@ -24,7 +24,8 @@ def main():
     """
 
     parser = argparse.ArgumentParser(
-        description="Takes a RO-Crate directory as input and uploads it to an InvenioRDM repository"
+        description="Takes a RO-Crate directory as input and uploads it to an "
+        "InvenioRDM repository"
     )
 
     parser.add_argument(
@@ -36,21 +37,24 @@ def main():
     parser.add_argument(
         "-d",
         "--datacite",
-        help="Path to a DataCite metadata file to use for the upload. Skips the conversion process from RO-Crate metadata to DataCite",
+        help="Path to a DataCite metadata file to use for the upload. Skips the "
+        "conversion process from RO-Crate metadata to DataCite",
         type=str,
         action="store",
         nargs=1,
     )
     parser.add_argument(
         "--no-upload",
-        help="Stop before creating InvenioRDM record and do not upload files. Use this option to create a DataCite metadata file for manual review",
+        help="Stop before creating InvenioRDM record and do not upload files. Use this "
+        "option to create a DataCite metadata file for manual review",
         action="store_true",
     )
     # included for backwards compatibility
     parser.add_argument(
         "-o",
         "--omit-roc-files",
-        help="Omit files named 'ro-crate-metadata.json' and directories/files containing 'ro-crate-preview' from the upload (not recommended)",
+        help="Omit files named 'ro-crate-metadata.json' and directories/files "
+        "containing 'ro-crate-preview' from the upload (not recommended)",
         action="store_true",
     )
     parser.add_argument(
@@ -62,7 +66,8 @@ def main():
     parser.add_argument(
         "-z",
         "--zip",
-        help="Instead of uploading all the files within the crate, create and upload a single zip file containing the whole crate",
+        help="Instead of uploading all the files within the crate, create and upload a "
+        "single zip file containing the whole crate",
         action="store_true",
     )
     args = parser.parse_args()
@@ -98,14 +103,19 @@ def deposit(
     The main function of the script.
     It takes a RO-Crate directory as input and uploads it to an InvenioRDM repository.
 
-    TODO: implement what the zip argument says it will do!
-
     :param ro_crate_dir: Path to the RO-Crate directory to upload.
-    :param datacite_file: Path to a DataCite metadata file which should be used for the upload. Skips the conversion process from RO-Crate metadata to DataCite. Defaults to None
-    :param no_upload: Stop before creating InvenioRDM record and do not upload files. Use this option to create a DataCite metadata file for manual review. Defaults to False
-    :param omit_roc_files: Omit files named 'ro-crate-metadata.json' and directories/files containing 'ro-crate-preview' from the upload (not recommended). Defaults to False
+    :param datacite_file: Path to a DataCite metadata file which should be used for the
+        upload. Skips the conversion process from RO-Crate metadata to DataCite.
+        Defaults to None
+    :param no_upload: Stop before creating InvenioRDM record and do not upload files.
+        Use this option to create a DataCite metadata file for manual review. Defaults
+        to False
+    :param omit_roc_files: Omit files named 'ro-crate-metadata.json' and
+        directories/files containing 'ro-crate-preview' from the upload (not
+        recommended). Defaults to False
     :param publish: Publish the record after uploading. Defaults to False
-    :param zip: Instead of uploading all the files within the crate, create and upload a single zip file containing the whole crate. Defaults to False
+    :param zip: Instead of uploading all the files within the crate, create and upload a
+        single zip file containing the whole crate. Defaults to False
     :return: The ID of the created record, or None if no record was created.
     """
 
@@ -135,7 +145,8 @@ def deposit(
 
     if not os.path.isfile(ro_crate_metadata_file):
         print(
-            f"'{ro_crate_dir}' is not a RO-Crate directory: 'ro-crate-metadata.json' not found."
+            f"'{ro_crate_dir}' is not a RO-Crate directory: "
+            "'ro-crate-metadata.json' not found."
         )
         sys.exit()
 
