@@ -10,7 +10,6 @@ from test.unit.utils import (
 )
 
 MINIMAL_CRATE_PATH = "test/data/minimal-ro-crate/ro-crate-metadata.json"
-TEST_CRATE_PATH = "test/data/test-ro-crate/ro-crate-metadata.json"
 TEST_REFERENCING_CRATE_PATH = (
     "test/data/test-referencing-ro-crate/ro-crate-metadata.json"
 )
@@ -57,7 +56,7 @@ def test_dereference_string():
 
 
 def test_dereference_entity():
-    rc = load_template_rc(MINIMAL_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
     expected = EXPECTED_REFERENCE_ENTITIES["license"]
 
@@ -67,7 +66,7 @@ def test_dereference_entity():
 
 
 def test_dereference_string_array_item():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
     expected = "text/plain"
 
@@ -77,7 +76,7 @@ def test_dereference_string_array_item():
 
 
 def test_dereference_entity_array_item():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
     expected = EXPECTED_REFERENCE_ENTITIES["author"]
 
@@ -184,13 +183,6 @@ def test_get_value_from_rc__succeeds(key: str, path: list | None, expected: dict
     ],
 )
 def test_get_value_from_rc__none(key, path):
-    """
-    ways of breaking -
-    empty key
-    missing path
-    incorrect path format
-    invalid key
-    """
     rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
 
     result = cu.get_value_from_rc(rc, key, path)
@@ -218,13 +210,6 @@ def test_get_value_from_rc__none(key, path):
     ],
 )
 def test_get_value_from_rc__error(key, path, expected_error, expected_message):
-    """
-    ways of breaking -
-    empty key
-    missing path
-    incorrect path format
-    invalid key
-    """
     rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
 
     with pytest.raises(expected_error, match=re.escape(expected_message)):
@@ -232,23 +217,9 @@ def test_get_value_from_rc__error(key, path, expected_error, expected_message):
 
 
 def test_get_referenced_entity__direct():
-    rc = load_template_rc(MINIMAL_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
-    expected = {
-        "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-        "@type": "CreativeWork",
-        "description": (
-            "This work is licensed under the Creative Commons "
-            "Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a "
-            "copy of this license, visit "
-            "http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to "
-            "Creative Commons, PO Box 1866, Mountain View, CA 94042, USA."
-        ),
-        "identifier": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-        "name": (
-            "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
-        ),
-    }
+    expected = EXPECTED_REFERENCE_ENTITIES["license"]
 
     result = cu.get_referenced_entity(rc, rde, "$license")
 
@@ -256,15 +227,9 @@ def test_get_referenced_entity__direct():
 
 
 def test_get_referenced_entity__array_item():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
-    expected = {
-        "@id": "https://orcid.org/0009-0001-3915-5910",
-        "@type": "Person",
-        "givenName": "Milan",
-        "familyName": "Szente",
-        "affiliation": {"@id": "https://ror.org/04d836q62"},
-    }
+    expected = EXPECTED_REFERENCE_ENTITIES["author"]
 
     result = cu.get_referenced_entity(rc, rde, "$author", 1)
 
@@ -272,7 +237,7 @@ def test_get_referenced_entity__array_item():
 
 
 def test_get_referenced_entity__nonexistent_key():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
 
     result = cu.get_referenced_entity(rc, rde, "$test")
@@ -281,7 +246,7 @@ def test_get_referenced_entity__nonexistent_key():
 
 
 def test_get_referenced_entity__fails_key_format():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
     key = "license"
 
@@ -290,7 +255,7 @@ def test_get_referenced_entity__fails_key_format():
 
 
 def test_get_referenced_entity__fails_list_no_index():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     rde = cu.rc_get_rde(rc)
     key = "$author"
 
@@ -302,7 +267,7 @@ def test_get_referenced_entity__fails_list_no_index():
 
 
 def test_get_referenced_entity__id_not_in_crate():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     parent_entity = {
         "@type": "CreativeWork",
         "@id": "ro-crate-metadata.json",
@@ -317,23 +282,9 @@ def test_get_referenced_entity__id_not_in_crate():
 
 
 def test_get_referenced_entity_from_root():
-    rc = load_template_rc(MINIMAL_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     key = "$license"
-    expected = {
-        "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-        "@type": "CreativeWork",
-        "description": (
-            "This work is licensed under the Creative Commons "
-            "Attribution-NonCommercial-ShareAlike 3.0 Australia License. To view a "
-            "copy of this license, visit "
-            "http://creativecommons.org/licenses/by-nc-sa/3.0/au/ or send a letter to "
-            "Creative Commons, PO Box 1866, Mountain View, CA 94042, USA."
-        ),
-        "identifier": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
-        "name": (
-            "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
-        ),
-    }
+    expected = EXPECTED_REFERENCE_ENTITIES["license"]
 
     result = cu.get_referenced_entity_from_root(rc, key)
 
@@ -341,7 +292,7 @@ def test_get_referenced_entity_from_root():
 
 
 def test_get_referenced_entity_from_root__key_not_in_rde(capsys):
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     key = "$conformsTo"
 
     result = cu.get_referenced_entity_from_root(rc, key)
@@ -352,7 +303,7 @@ def test_get_referenced_entity_from_root__key_not_in_rde(capsys):
 
 
 def test_get_referenced_entity_from_root__id_not_in_crate(capsys):
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     key = "$test"
     value = {"@id": "https://example.org"}
     set_field_in_template_rde(key[1:], value, rc)
@@ -364,7 +315,7 @@ def test_get_referenced_entity_from_root__id_not_in_crate(capsys):
 
 
 def test_get_referenced_entity_from_root__fails_key_format():
-    rc = load_template_rc(TEST_CRATE_PATH)
+    rc = load_template_rc(TEST_REFERENCING_CRATE_PATH)
     key = "license"
 
     with pytest.raises(mu.MappingException, match=re.escape("$-prefixed key expected")):
