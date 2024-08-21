@@ -34,9 +34,6 @@ def dc():
     return setup_dc()
 
 
-# @pytest.mark.xfail(
-#     reason="known bug - https://github.com/ResearchObject/ro-crate-inveniordm/issues/1"
-# )
 def test_publisher_string(rc, dc):
     rc, _ = set_field_in_template_rde("publisher", publisher_string, rc)
     rule_name = "publisher_mapping_1"
