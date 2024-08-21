@@ -18,9 +18,9 @@
                 "LearningResource"
             ],
             "name": "Demo Crate",
-            "description": "a demo crate for Galaxy training",
+            "description": "a demo crate for testing",
             "datePublished": "2024-03-08",
-            "publisher": "https://ror.org/0abcdef00",
+            "publisher": "Test Organization",
             "license": {
                 "@id": "https://spdx.org/licenses/CC-BY-NC-SA-4.0.html",
                 "@type": "CreativeWork",
