@@ -56,8 +56,8 @@
         ],
         "title": "Demo Crate",
         "publication_date": "2024-03-08",
-        "description": "a demo crate for Galaxy training",
-        "publisher": ":unkn",
+        "description": "a demo crate for testing",
+        "publisher": "Test Organization",
         "rights": [
             {
                 "title": {

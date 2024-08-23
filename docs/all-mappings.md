@@ -75,7 +75,8 @@ Note that RO-Crate and DataCite each contain features that the other does not ha
 
 ## Mapping of publisher
 
-- maps `publisher.name` to `metadata.publisher`
+- if `publisher` is a string, maps `publisher` to `metadata.publisher`
+- if `publisher` is an object, maps `publisher.name` to `metadata.publisher`
 - if no publisher exists, the value is `:unkn`
 
 ## Mapping of identifier
