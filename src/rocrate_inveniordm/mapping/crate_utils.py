@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from rocrate_inveniordm.mapping.mapping_utils import clean_key, MappingException
 
 
