@@ -5,9 +5,9 @@ name: Test with mypy and pytest
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -16,36 +16,36 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-        matrix:
-            os: [ubuntu-latest]
-            python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install poetry
-      run: |
-        sudo apt install -y pipx
-        pipx install poetry
-    - name: Install dependencies
-      run: |
-        poetry install
-    - name: Set up credentials
-      run: |
-        echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
-        echo "INVENIORDM_API_KEY=\"$ZENODO_SANDBOX_API_KEY\"" >> .env
-      shell: bash
-      env:
-        ZENODO_SANDBOX_API_KEY : ${{secrets.ZENODO_SANDBOX_API_KEY}}
-    - name: Lint with mypy
-      run: |
-        poetry run mypy . --ignore-missing-imports
-    - name: Test with pytest
-      run: |
-        poetry run pytest
-    - uses: actions/upload-artifact@v4
-      with:
-        name: test-outputs-${{ matrix.os }}-python${{ matrix.python-version }}
-        path: test/output/
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: |
+          sudo apt install -y pipx
+          pipx install poetry
+      - name: Install dependencies
+        run: |
+          poetry install
+      - name: Set up credentials
+        run: |
+          echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
+          echo "INVENIORDM_API_KEY=\"$ZENODO_SANDBOX_API_KEY\"" >> .env
+        shell: bash
+        env:
+          ZENODO_SANDBOX_API_KEY: ${{secrets.ZENODO_SANDBOX_API_KEY}}
+      - name: Lint with mypy
+        run: |
+          poetry run mypy . --ignore-missing-imports
+      - name: Test with pytest
+        run: |
+          poetry run pytest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-outputs-${{ matrix.os }}-python${{ matrix.python-version }}
+          path: test/output/
