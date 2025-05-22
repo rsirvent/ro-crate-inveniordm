@@ -96,3 +96,12 @@ def convert_to_iso_639_3(value):
         return None
 
     return code
+
+def typeProcessing(value):
+    """
+    Checks if the 'mainEntity' type includes 'ComputationalWorkflow'
+    """
+    if "ComputationalWorkflow" in value:
+        return "workflow"
+    else:
+        return "dataset"

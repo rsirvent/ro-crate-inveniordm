@@ -7,19 +7,20 @@ Note that RO-Crate and DataCite each contain features that the other does not ha
 ## Mapping of resource type
 
 - `resource_type` is a mandatory field in DataCite
--  RO-Crate does not have a field that describes the type of the entire directory
--  Therefore, we assume the type to be `dataset`
+- RO-Crate does not have a field that describes the type of the entire directory
+- Therefore, we assume the type to be `dataset` by default
+- Only if the 'mainEntity' includes the type 'ComputationalWorkflow', DataCite type is set to 'workflow'
 
 ## Mapping of creators
 
-- an `author` in RO-Crate is mapped to a `creator` in DataCite, alongside with their affiliations
+- an `author` or a `creator` in RO-Crate is mapped to a `creator` in DataCite, alongside with their affiliations
 - if the `@id` field of an author is an ORCiD, the ORCiD field is parsed and added in DataCite
 - consists of `person or organization` and `affiliation`
 - if no creator exists, the creator is chosen to be the value `:unkn`
 
 ## Mapping of contributors
 
-- similar to creator mapping
+- similar to creator mapping, but only `contributor` is mapped to `contributors` in DataCite if they have been defined (since they are a valid schema.org term but not mandatory in RO-Crate)
 
 ## Mapping of title
 

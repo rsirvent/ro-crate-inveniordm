@@ -3,14 +3,15 @@
 
         "resource_type_mapping": {
             "mappings": {
-                "resource_type_mapping_1": {
+                "workflow_resource_type_mapping": {
+                    "from": "$mainEntity.@type",
                     "to": "metadata.resource_type.id",
-                    "value": "dataset"
+                    "processing": "$typeProcessing"
                 }
             }
         },
 
-        "creators_mapping": {
+        "authors_mapping": {
             "mappings": {
                 "person_or_org_type_mapping_direct": {
                     "from": "author[]",
@@ -82,10 +83,82 @@
             }
         },
 
+        "creators_mapping": {
+            "mappings": {
+                "person_or_org_type_mapping_direct": {
+                    "from": "creator[]",
+                    "to": "metadata.creators[].person_or_org",
+                    "value": {
+                        "type": "organizational",
+                        "name": "@@this"
+                    },
+                    "onlyIf": "?string"
+                },
+                "person_or_org_type_mapping": {
+                    "from": "$creator[].@type",
+                    "to": "metadata.creators[].person_or_org.type",
+                    "processing": "$authorProcessing"
+                },
+                "person_or_org_type_mapping_given_name": {
+                    "from": "$creator[].givenName",
+                    "to": "metadata.creators[].person_or_org.given_name"
+                },
+                "person_or_org_type_mapping_family_name": {
+                    "from": "$creator[].familyName",
+                    "to": "metadata.creators[].person_or_org.family_name"
+                },
+                "person_or_org_type_mapping_name_lastname": {
+                    "from": "$creator[].familyName",
+                    "to": "metadata.creators[].person_or_org.name"
+                },
+                "person_or_org_type_mapping_name": {
+                    "from": "$creator[].name",
+                    "to": "metadata.creators[].person_or_org.name"
+                },
+                
+                "person_or_org_type_mapping_identifiers_scheme": {
+                    "from": "$creator[].@id[]",
+                    "to": "metadata.creators[].person_or_org.identifiers[].scheme",
+                    "onlyIf": "?orcid",
+                    "value": "orcid"
+                    
+                },
+                "person_or_org_type_mapping_identifiers_identifier": {
+                    "from": "$creator[].@id[]",
+                    "to": "metadata.creators[].person_or_org.identifiers[].identifier",
+                    "onlyIf": "?orcid",
+                    "processing": "$orcidProcessing"
+                },
+
+                "role_mapping": {
+                    "_note": "Does not exist in RO-Crate, thus ommitted",
+                    "_ignore": true
+                },
+
+                "affiliation_mapping_direct": {
+                    "from": "$creator[].affiliation[]",
+                    "to": "metadata.creators[].affiliations[].name"
+                },
+                "affiliation_mapping_id": {
+                    "_ignore": true,
+                    "from": "$creator[].$affiliation[].@id",
+                    "to": "metadata.creators[].affiliations[].id"
+                },
+                "affiliation_mapping_name": {
+                    "from": "$creator[].$affiliation[].name",
+                    "to": "metadata.creators[].affiliations[].name"
+                }
+            },
+            "ifNonePresent": {
+                "metadata.creators[].person_or_org.name": ":unkn",
+                "metadata.creators[].person_or_org.type": "organizational"
+            }
+        },
+
         "contributors_mapping": {
             "mappings": {
                 "person_or_org_type_mapping_direct": {
-                    "from": "author[]",
+                    "from": "contributor[]",
                     "to": "metadata.contributors[].person_or_org",
                     "value": {
                         "type": "organizational",
@@ -94,38 +167,38 @@
                     "onlyIf": "?string"
                 },
                 "person_or_org_type_mapping": {
-                    "from": "$author[].@type",
+                    "from": "$contributor[].@type",
                     "to": "metadata.contributors[].person_or_org.type",
                     "processing": "$authorProcessing"
                 },
                 "person_or_org_type_mapping_given_name": {
-                    "from": "$author[].givenName",
+                    "from": "$contributor[].givenName",
                     "to": "metadata.contributors[].person_or_org.given_name"
                 },
                 "person_or_org_type_mapping_family_name": {
-                    "from": "$author[].familyName",
+                    "from": "$contributor[].familyName",
                     "to": "metadata.contributors[].person_or_org.family_name"
                 },
                 "person_or_org_type_mapping_identifiers_scheme": {
-                    "from": "$author[].@id[]",
+                    "from": "$contributor[].@id[]",
                     "to": "metadata.contributors[].person_or_org.identifiers[].scheme",
                     "onlyIf": "?orcid",
                     "value": "orcid"
                     
                 },
                 "person_or_org_type_mapping_identifiers_identifier": {
-                    "from": "$author[].@id[]",
+                    "from": "$contributor[].@id[]",
                     "to": "metadata.contributors[].person_or_org.identifiers[].identifier",
                     "onlyIf": "?orcid",
                     "processing": "$orcidProcessing"
                 },
                 "person_or_org_type_mapping_name": {
-                    "from": "$author[].name",
+                    "from": "$contributor[].name",
                     "to": "metadata.contributors[].person_or_org.name"
                 },
 
                 "role_mapping": {
-                    "from": "$author[]",
+                    "from": "$contributor[]",
                     "to": "metadata.contributors[].role",
                     "value": {
                         "id": "editor"
@@ -133,16 +206,16 @@
                 },
 
                 "affiliation_mapping_direct": {
-                    "from": "$author[].affiliation[]",
+                    "from": "$contributor[].affiliation[]",
                     "to": "metadata.contributors[].affiliations[].name"
                 },
                 "affiliation_mapping_id": {
                     "_ignore": true,
-                    "from": "$author[].$affiliation[].@id",
+                    "from": "$contributor[].$affiliation[].@id",
                     "to": "metadata.contributors[].affiliations[].id"
                 },
                 "affiliation_mapping_name": {
-                    "from": "$author[].$affiliation[].name",
+                    "from": "$contributor[].$affiliation[].name",
                     "to": "metadata.contributors[].affiliations[].name"
                 }
             }
