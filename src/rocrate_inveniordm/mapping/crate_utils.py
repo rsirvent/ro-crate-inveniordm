@@ -74,8 +74,6 @@ def rc_get_rde(rc):
     raise ValueError("Unknown root data entity")
 
 
-
-
 def get_value_from_rc(rc, from_key, path=[]):
     """
     Retrieves the value of the given key from the given RO-Crate.
