@@ -118,3 +118,21 @@ def nameProcessing(value):
     new_name["given_name"] = " ".join(parts[:-1]) if len(parts) > 1 else ""
     new_name["name"] = value
     return new_name
+
+
+def rightsProcessing(value):
+    """
+    Create a license name from the provided URL, so it is added in Zenodo
+    """
+    from urllib.parse import urlparse
+
+    parsed = urlparse(value)
+    new_value = {}
+    new_value["title"] = {"en": parsed.path.strip("/").replace("/", " ").title()}
+    new_value["link"] = value
+    # if parsed.netloc == "spdx.org":
+    #     new_detail = {}
+    #     new_detail["id"] = parsed.path.strip("/").split("/")[-1]
+    #     new_detail["scheme"] = "spdx"
+    #     return (new_value, new_detail)
+    return new_value
