@@ -110,11 +110,11 @@ def typeProcessing(value):
 def nameProcessing(value):
     """
     family_name is mandatory in Zenodo. Does not overwrite familyName and givenName
-    from the RO-Crate if they are provided
+    from the RO-Crate if they are provided, since this mapping is done before
     """
     new_name = {}
     parts = value.strip().split()
     new_name["family_name"] = parts[-1] if len(parts) > 0 else ""
     new_name["given_name"] = " ".join(parts[:-1]) if len(parts) > 1 else ""
-
+    new_name["name"] = value
     return new_name

@@ -13,6 +13,20 @@
 
         "authors_mapping": {
             "mappings": {
+                "person_or_org_type_mapping_name_to_family_and_given": {
+                    "from": "$author[].name",
+                    "to": "metadata.creators[].person_or_org",
+                    "processing": "$nameProcessing"
+                },
+                "person_or_org_type_mapping_given_name": {
+                    "from": "$author[].givenName",
+                    "to": "metadata.creators[].person_or_org.given_name"
+                },
+                "person_or_org_type_mapping_family_name": {
+                    "from": "$author[].familyName",
+                    "to": "metadata.creators[].person_or_org.family_name"
+                },
+
                 "person_or_org_type_mapping_direct": {
                     "from": "author[]",
                     "to": "metadata.creators[].person_or_org",
@@ -27,34 +41,12 @@
                     "to": "metadata.creators[].person_or_org.type",
                     "processing": "$authorProcessing"
                 },
-                "person_or_org_type_mapping_given_name": {
-                    "from": "$author[].givenName",
-                    "to": "metadata.creators[].person_or_org.given_name"
-                },
-                "person_or_org_type_mapping_family_name": {
-                    "from": "$author[].familyName",
-                    "to": "metadata.creators[].person_or_org.family_name"
-                },
-                "person_or_org_type_mapping_name_lastname": {
-                    "from": "$author[].familyName",
-                    "to": "metadata.creators[].person_or_org.name"
-                },
-                "person_or_org_type_mapping_name": {
-                    "from": "$author[].name",
-                    "to": "metadata.creators[].person_or_org.name"
-                },
-                "person_or_org_type_mapping_name_to_family_and_given": {
-                    "from": "$author[].name",
-                    "to": "metadata.creators[].person_or_org",
-                    "processing": "$nameProcessing"
-                },
 
                 "person_or_org_type_mapping_identifiers_scheme": {
                     "from": "$author[].@id[]",
                     "to": "metadata.creators[].person_or_org.identifiers[].scheme",
                     "onlyIf": "?orcid",
                     "value": "orcid"
-                    
                 },
                 "person_or_org_type_mapping_identifiers_identifier": {
                     "from": "$author[].@id[]",
@@ -88,85 +80,22 @@
             }
         },
 
-        "creators_mapping": {
-            "mappings": {
-                "person_or_org_type_mapping_direct": {
-                    "from": "creator[]",
-                    "to": "metadata.creators[].person_or_org",
-                    "value": {
-                        "type": "organizational",
-                        "name": "@@this"
-                    },
-                    "onlyIf": "?string"
-                },
-                "person_or_org_type_mapping": {
-                    "from": "$creator[].@type",
-                    "to": "metadata.creators[].person_or_org.type",
-                    "processing": "$authorProcessing"
-                },
-                "person_or_org_type_mapping_given_name": {
-                    "from": "$creator[].givenName",
-                    "to": "metadata.creators[].person_or_org.given_name"
-                },
-                "person_or_org_type_mapping_family_name": {
-                    "from": "$creator[].familyName",
-                    "to": "metadata.creators[].person_or_org.family_name"
-                },
-                "person_or_org_type_mapping_name_lastname": {
-                    "from": "$creator[].familyName",
-                    "to": "metadata.creators[].person_or_org.name"
-                },
-                "person_or_org_type_mapping_name": {
-                    "from": "$creator[].name",
-                    "to": "metadata.creators[].person_or_org.name"
-                },
-                "person_or_org_type_mapping_name_to_family_and_given": {
-                    "from": "$creator[].name",
-                    "to": "metadata.creators[].person_or_org",
-                    "processing": "$nameProcessing"
-                },
-                
-                "person_or_org_type_mapping_identifiers_scheme": {
-                    "from": "$creator[].@id[]",
-                    "to": "metadata.creators[].person_or_org.identifiers[].scheme",
-                    "onlyIf": "?orcid",
-                    "value": "orcid"
-                    
-                },
-                "person_or_org_type_mapping_identifiers_identifier": {
-                    "from": "$creator[].@id[]",
-                    "to": "metadata.creators[].person_or_org.identifiers[].identifier",
-                    "onlyIf": "?orcid",
-                    "processing": "$orcidProcessing"
-                },
-
-                "role_mapping": {
-                    "_note": "Does not exist in RO-Crate, thus ommitted",
-                    "_ignore": true
-                },
-
-                "affiliation_mapping_direct": {
-                    "from": "$creator[].affiliation[]",
-                    "to": "metadata.creators[].affiliations[].name"
-                },
-                "affiliation_mapping_id": {
-                    "_ignore": true,
-                    "from": "$creator[].$affiliation[].@id",
-                    "to": "metadata.creators[].affiliations[].id"
-                },
-                "affiliation_mapping_name": {
-                    "from": "$creator[].$affiliation[].name",
-                    "to": "metadata.creators[].affiliations[].name"
-                }
-            },
-            "ifNonePresent": {
-                "metadata.creators[].person_or_org.name": ":unkn",
-                "metadata.creators[].person_or_org.type": "organizational"
-            }
-        },
-
         "contributors_mapping": {
             "mappings": {
+                "person_or_org_type_mapping_name_to_family_and_given": {
+                    "from": "$contributor[].name",
+                    "to": "metadata.contributors[].person_or_org",
+                    "processing": "$nameProcessing"
+                },
+                "person_or_org_type_mapping_given_name": {
+                    "from": "$contributor[].givenName",
+                    "to": "metadata.contributors[].person_or_org.given_name"
+                },
+                "person_or_org_type_mapping_family_name": {
+                    "from": "$contributor[].familyName",
+                    "to": "metadata.contributors[].person_or_org.family_name"
+                },
+
                 "person_or_org_type_mapping_direct": {
                     "from": "contributor[]",
                     "to": "metadata.contributors[].person_or_org",
@@ -180,19 +109,6 @@
                     "from": "$contributor[].@type",
                     "to": "metadata.contributors[].person_or_org.type",
                     "processing": "$authorProcessing"
-                },
-                "person_or_org_type_mapping_given_name": {
-                    "from": "$contributor[].givenName",
-                    "to": "metadata.contributors[].person_or_org.given_name"
-                },
-                "person_or_org_type_mapping_family_name": {
-                    "from": "$contributor[].familyName",
-                    "to": "metadata.contributors[].person_or_org.family_name"
-                },
-                "person_or_org_type_mapping_name_to_family_and_given": {
-                    "from": "$contributor[].name",
-                    "to": "metadata.contributor[].person_or_org",
-                    "processing": "$nameProcessing"
                 },
 
                 "person_or_org_type_mapping_identifiers_scheme": {
@@ -213,6 +129,7 @@
                 },
 
                 "role_mapping": {
+                    "_ignore": true,
                     "from": "$contributor[]",
                     "to": "metadata.contributors[].role",
                     "value": {

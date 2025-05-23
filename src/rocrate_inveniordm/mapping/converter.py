@@ -51,6 +51,8 @@ def convert(rc: dict, metadata_only: bool = False) -> dict:
     :return: Dictionary containing DataCite metadata
     """
 
+    rc = merge_authors_and_creators(rc)
+
     m = load_mapping_json()
 
     dc = setup_dc()
@@ -424,6 +426,19 @@ def process(process_rule, value):
         raise NotImplementedError(f"Function {process_rule} not implemented.")
     return function(value)
 
+
+def merge_authors_and_creators(rc:dict):
+    """
+    Copy creators to authors in the RO-Crate, so they can be processed in a single mapping.
+    Mapping from 'author' to 'creators' and later from 'creator' to 'creators' causes overwritings.
+    """
+    for item in rc["@graph"]:
+        if "creator" in item:
+            for person in item["creator"]:
+                urls_orcid = [name["@id"] for name in item["author"]]
+                if person["@id"] not in urls_orcid:
+                    item["author"].append(person)
+    return rc
 
 if __name__ == "__main__":
     main()
