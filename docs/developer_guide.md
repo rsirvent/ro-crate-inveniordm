@@ -39,7 +39,7 @@ Some tests can make Zenodo uploads using your access token. The [environment var
 
 To run all tests **except** the ones which make uploads:
 ```bash
-pytest -k "not needs_credentials"
+pytest -m "not needs_credentials"
 ```
 
 To run all tests **including** the ones which make uploads:

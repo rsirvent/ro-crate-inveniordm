@@ -48,10 +48,10 @@ jobs:
       # interacts with the InvenioRDM API
       - name: Test with pytest (except uploads)
         run: |
-          poetry run pytest -k "not needs_credentials"
+          poetry run pytest -m "not needs_credentials"
       - name: Test with pytest (uploads only)
         run: |
-          poetry run pytest -k "needs_credentials"
+          poetry run pytest -m "needs_credentials"
         if: ${{ env.ZENODO_SANDBOX_API_KEY != '' }}
       # output ro-crate-metadata.json files and log files are saved as these are useful for debugging
       - uses: actions/upload-artifact@v4
