@@ -62,6 +62,7 @@ def test_created_datacite_files(crate_name):
         assert output_json == expected_json
 
 
+@pytest.mark.needs_credentials
 @pytest.mark.parametrize("crate_name", [*CRATES])
 def test_created_invenio_records(crate_name):
     # Arrange
@@ -123,6 +124,7 @@ def test_created_invenio_records(crate_name):
     assert record["submitted"] is False
 
 
+@pytest.mark.needs_credentials
 def test_cli__zip():
     """Test uploading RO-Crate as a single zip file."""
     # Arrange
@@ -156,6 +158,7 @@ def test_cli__zip():
     assert result_zip["checksum"] == local_checksum
 
 
+@pytest.mark.needs_credentials
 def test_cli__datacite():
     """Test creating a record from a pre-existing DataCite file."""
     # Arrange
@@ -191,6 +194,7 @@ def test_cli__datacite():
     assert record["submitted"] is False
 
 
+@pytest.mark.needs_credentials
 def test_cli__omit_roc_files():
     """Test creating a record with omit_roc_files option."""
     # Arrange
@@ -220,6 +224,7 @@ def test_cli__omit_roc_files():
         assert "ro-crate-preview" not in str(local_path.relative_to(crate_path))
 
 
+@pytest.mark.needs_credentials
 def test_cli__publish():
     """Test creating a record with publish option."""
     # Arrange

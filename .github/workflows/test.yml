@@ -5,9 +5,9 @@ name: Test with mypy and pytest
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -16,33 +16,45 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.9", "3.12"]
+    env:
+      ZENODO_SANDBOX_API_KEY: ${{secrets.ZENODO_SANDBOX_API_KEY}}
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install poetry
-      run: |
-        python -m pip install poetry
-    - name: Install dependencies
-      run: |
-        poetry install
-    - name: Set up credentials
-      run: |
-        echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
-        echo "INVENIORDM_API_KEY=\"$ZENODO_SANDBOX_API_KEY\"" >> .env
-      shell: bash
-      env:
-        ZENODO_SANDBOX_API_KEY : ${{secrets.ZENODO_SANDBOX_API_KEY}}
-    - name: Lint with mypy
-      run: |
-        poetry run mypy . --ignore-missing-imports
-    - name: Test with pytest
-      run: |
-        poetry run pytest
-    - uses: actions/upload-artifact@v4
-      with:
-        name: test-outputs-${{ matrix.os }}-python${{ matrix.python-version }}
-        path: test/output/
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: |
+          python -m pip install poetry
+      - name: Install dependencies
+        run: |
+          poetry install
+      - name: Set up credentials
+        run: |
+          echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
+          echo "INVENIORDM_API_KEY=\"$ZENODO_SANDBOX_API_KEY\"" >> .env
+        shell: bash
+      - name: Lint with mypy
+        run: |
+          poetry run mypy . --ignore-missing-imports
+      # tests with pytest are split into two steps:
+      # tests that do not require InvenioRDM API credentials are always run,
+      # but tests that require credentials are only run if the relevant secret is set.
+      # Contributors only need to set the secret if they are modifying the code that
+      # interacts with the InvenioRDM API
+      - name: Test with pytest (except uploads)
+        run: |
+          poetry run pytest -k "not needs_credentials"
+      - name: Test with pytest (uploads only)
+        run: |
+          poetry run pytest -k "needs_credentials"
+        if: ${{ ZENODO_SANDBOX_API_KEY != '' }}
+      # output ro-crate-metadata.json files and log files are saved as these are useful for debugging
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-output-${{ matrix.os }}-python${{ matrix.python-version }}
+          path: test/output/
