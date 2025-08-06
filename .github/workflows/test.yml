@@ -36,7 +36,7 @@ jobs:
       - name: Set up credentials
         run: |
           echo "INVENIORDM_BASE_URL=\"https://sandbox.zenodo.org/\"" >> .env
-          echo "INVENIORDM_API_KEY=\"$ZENODO_SANDBOX_API_KEY\"" >> .env
+          echo "INVENIORDM_API_KEY=\"${{ env.ZENODO_SANDBOX_API_KEY }} \"" >> .env
         shell: bash
       - name: Lint with mypy
         run: |
@@ -52,7 +52,7 @@ jobs:
       - name: Test with pytest (uploads only)
         run: |
           poetry run pytest -k "needs_credentials"
-        if: ${{ ZENODO_SANDBOX_API_KEY != '' }}
+        if: ${{ env.ZENODO_SANDBOX_API_KEY != '' }}
       # output ro-crate-metadata.json files and log files are saved as these are useful for debugging
       - uses: actions/upload-artifact@v4
         with:
