@@ -106,3 +106,7 @@ The result of uploading the [`/test/test-ro-crate`](./test/test-ro-crate/) direc
 We tested the tool on a real-world RO-Crate ([https://reliance.rohub.org/b927e3d8-5bfd-4332-b14c-ab3a07d36dc6?activetab=overview](https://reliance.rohub.org/b927e3d8-5bfd-4332-b14c-ab3a07d36dc6?activetab=overview)). The result is shown below:
 
 ![](./images/real-world-example.png)
+
+## For Developers
+
+See the [developer guide](docs/developer_guide.md) for information on project structure and how to contribute. Pull requests and issues from new contributors are welcome!
