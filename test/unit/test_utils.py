@@ -1,6 +1,7 @@
 import os
 import pytest
 from requests.exceptions import HTTPError
+from unittest import mock
 
 from rocrate_inveniordm.deposit import deposit
 import rocrate_inveniordm.upload.credentials as credentials
@@ -76,6 +77,7 @@ def test_get_mapping_class():
     assert out == expected
 
 
+@mock.patch.dict(os.environ, {"INVENIORDM_API_KEY": "example-for-testing"})
 def test_get_request_headers():
     expected_headers = {
         "Accept": "application/json",
@@ -88,6 +90,7 @@ def test_get_request_headers():
     assert headers == expected_headers
 
 
+@pytest.mark.needs_credentials
 def test_fetch_inveniordm_record__exists():
     """Test fetching a created record."""
     # Arrange
@@ -102,6 +105,7 @@ def test_fetch_inveniordm_record__exists():
     assert "metadata" in record
 
 
+@pytest.mark.needs_credentials
 def test_fetch_inveniordm_record__nonexistent():
     """Test that fetching a nonexistent record raises an error."""
     # Arrange
