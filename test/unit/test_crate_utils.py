@@ -110,6 +110,7 @@ def test_rc_get_rde():
 
     assert result == expected
 
+
 def test_rc_get_rde_legacy_metadata():
     # Load a legacy crate where the metadata file is `ro-crate-metadata.jsonld`
     rc = load_template_rc(LEGACY_CRATE_PATH)
