@@ -66,7 +66,7 @@ def convert(rc: dict, metadata_only: bool = False) -> dict:
         raise MappingException("Mapping does not contain a '$root' key.")
 
     for mapping_class in root_rules:
-        print()
+        # print()
 
         # Ignore mappings that are marked as ignored
         if "_ignore" in root_rules.get(mapping_class).keys():
@@ -89,7 +89,7 @@ def convert(rc: dict, metadata_only: bool = False) -> dict:
             print(f"\t|- Applying mapping {mapping_key}")
 
             mapping = mappings.get(mapping_key)
-            dc, any_present = apply_mapping(mapping, mapping_paths, rc, dc)
+            dc, any_present = apply_mapping(mapping, mapping_paths, rc, dc, mapping_key)
             is_any_present = is_any_present or any_present
 
         if not is_any_present:
@@ -137,7 +137,7 @@ def get_mapping_paths(rc: dict, mappings: dict) -> dict:
     return mapping_paths
 
 
-def apply_mapping(mapping, mapping_paths, rc, dc):  # noqa: C901
+def apply_mapping(mapping, mapping_paths, rc, dc, mapping_key):  # noqa: C901
     """Convert RO-Crate metadata to DataCite according to the specified mapping and
     paths.
 
@@ -154,6 +154,7 @@ def apply_mapping(mapping, mapping_paths, rc, dc):  # noqa: C901
     :param mapping_paths: A list of paths, used to disambiguate array values
     :param rc: Dictionary of RO-Crate metadata
     :param dc: Dictionary of DataCite metadata
+    :param mapping_key: The key of the mapping being applied
     :return: tuple containing the updated dictionary of DataCite metadata, and a boolean
         indicating whether the rule was applied
     """
@@ -181,8 +182,15 @@ def apply_mapping(mapping, mapping_paths, rc, dc):  # noqa: C901
         paths = mapping_paths.get(processed_string)
         print(f"\t\t|- Paths: {paths}")
 
-    for path in paths:
-        print(f"PATH: {path}")
+    for i, path in enumerate(paths):
+        if mapping_key.startswith("publisher_mapping") and i > 0:
+            # RO-Crate can have a list of publishers, but DataCite only supports one
+            # publisher. So, we only apply the first one.
+            print(
+                f"\t\t|- Skipping path {i} for mapping {mapping_key} to avoid "
+                "overwriting previous values."
+            )
+            continue
         new_path = path.copy()
         from_value = get_value_from_rc(rc.copy(), from_mapping_value, new_path)
 
@@ -215,7 +223,7 @@ def apply_mapping(mapping, mapping_paths, rc, dc):  # noqa: C901
                 f"{path.copy()}"
             )
             rule_applied = True
-            print(dc, to_mapping_value, from_value)
+            # print(dc, to_mapping_value, from_value)
             dc = set_dc(dc, to_mapping_value, from_value, path.copy())
 
     return dc, rule_applied

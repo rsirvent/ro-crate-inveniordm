@@ -316,12 +316,12 @@
         "publisher_mapping": {
             "mappings": {
                 "publisher_mapping_direct": {
-                    "from": "publisher",
+                    "from": "publisher[]",
                     "to": "metadata.publisher",
                     "onlyIf": "?string"
                 },
                 "publisher_mapping_name": {
-                    "from": "$publisher.name",
+                    "from": "$publisher[].name",
                     "to": "metadata.publisher"
                 }
             },
