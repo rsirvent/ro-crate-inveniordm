@@ -217,6 +217,9 @@ def apply_mapping(mapping, mapping_paths, rc, dc, mapping_key):  # noqa: C901
         if value_mapping_value:
             from_value = transform_to_target_format(value_mapping_value, from_value)
 
+        if from_value is None and "ifNonePresent" in mapping:
+            from_value = mapping["ifNonePresent"]
+
         if from_value is not None:
             print(
                 f"\t\t|- Adding {from_value} to {to_mapping_value} with path "

@@ -11,8 +11,13 @@
             }
         },
 
-        "authors_mapping": {
+        "creators_mapping": {
             "mappings": {
+                "author_name_mapping": {
+                    "from": "author[].name",
+                    "to": "metadata.creators[].person_or_org.name",
+                    "ifNonePresent": ":unkn"
+                },
                 "person_or_org_type_mapping_name_to_family_and_given": {
                     "from": "$author[].name",
                     "to": "metadata.creators[].person_or_org",
@@ -72,11 +77,11 @@
                 "affiliation_mapping_name": {
                     "from": "$author[].$affiliation[].name",
                     "to": "metadata.creators[].affiliations[].name"
-                }
-            },
-            "ifNonePresent": {
-                "metadata.creators[].person_or_org.name": ":unkn",
-                "metadata.creators[].person_or_org.type": "organizational"
+                },
+                "ifNonePresent": {
+                    "metadata.creators[].person_or_org.name": ":unkn",
+                    "metadata.creators[].person_or_org.type": "organizational"
+                }   
             }
         },
 
