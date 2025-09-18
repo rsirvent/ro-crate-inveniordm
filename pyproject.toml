@@ -61,3 +61,6 @@ rocrate_inveniordm = "rocrate_inveniordm.deposit:main"
 [tool.pytest.ini_options]
 pythonpath = "src"
 addopts = "--cov=rocrate_inveniordm"
+markers = [
+  "needs_credentials: test requires INVENIORDM_BASE_URL and INVENIORDM_API_KEY environment variables to be set"
+]

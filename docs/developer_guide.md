@@ -35,9 +35,14 @@ poetry shell
 
 ## Run tests
 
-Beware that tests can make Zenodo uploads using your access token.
+Some tests can make Zenodo uploads using your access token. The [environment variables](#set-up-the-environmental-variables) must be configured in order for those tests to succeed. But you can also choose to run the test suite without them.
 
-In the root directory:
+To run all tests **except** the ones which make uploads:
+```bash
+pytest -m "not needs_credentials"
+```
+
+To run all tests **including** the ones which make uploads:
 ```bash
 pytest
 ```

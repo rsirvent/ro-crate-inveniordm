@@ -15,6 +15,7 @@ MINIMAL_CRATE_PATH = "test/data/minimal-ro-crate/ro-crate-metadata.json"
 TEST_REFERENCING_CRATE_PATH = (
     "test/data/test-referencing-ro-crate/ro-crate-metadata.json"
 )
+LEGACY_CRATE_PATH = "test/data/legacy-ro-crate/ro-crate-metadata.jsonld"
 
 EXPECTED_REFERENCE_ENTITIES: dict[str, dict] = {
     "license": {
@@ -108,6 +109,37 @@ def test_rc_get_rde():
     result = cu.rc_get_rde(rc)
 
     assert result == expected
+
+
+def test_rc_get_rde_legacy_metadata():
+    # Load a legacy crate where the metadata file is `ro-crate-metadata.jsonld`
+    rc = load_template_rc(LEGACY_CRATE_PATH)
+
+    result = cu.rc_get_rde(rc)
+
+    assert result is not None, "Root Data Entity should be found in legacy crates"
+    assert result["@id"] == "./", "Legacy RDE should have @id './'"
+    assert result["@type"] == "Dataset", "RDE should always be of type Dataset"
+
+
+def test_rc_get_rde_missing_root_entity():
+    # Build a fake crate without the RDE in the graph
+    rc = {
+        "@context": "https://w3id.org/ro/crate/1.1/context",
+        "@graph": [
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                "about": {"@id": "./"},
+            },
+            # Intentionally no entity with "@id": "./"
+        ],
+    }
+
+    with pytest.raises(ValueError) as exc_info:
+        cu.rc_get_rde(rc)
+
+    assert "Unknown root data entity" in str(exc_info.value)
 
 
 @pytest.mark.parametrize(
