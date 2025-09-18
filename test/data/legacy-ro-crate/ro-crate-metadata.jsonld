@@ -1,0 +1,24 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
+    {
+      "@id": "ro-crate-metadata.jsonld",
+      "@type": "CreativeWork",
+      "about": { "@id": "./" }
+    },
+    {
+      "@id": "./",
+      "@type": "Dataset",
+      "identifier": "https://doi.org/10.4225/59/59672c09f4a4b",
+      "datePublished": "2017",
+      "name": "Legacy Dataset for Testing",
+      "description": "This is a minimal legacy RO-Crate root entity for tests.",
+      "license": { "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/" }
+    },
+    {
+      "@id": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
+      "@type": "CreativeWork",
+      "name": "Attribution-NonCommercial-ShareAlike 3.0 Australia (CC BY-NC-SA 3.0 AU)"
+    }
+  ]
+}
