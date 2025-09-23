@@ -137,8 +137,7 @@ def rightsProcessing(value):
     new_value = {}
     new_value["title"] = {"en": title}
     new_value["link"] = value
-    # spdx schema not working in Zenodo right now, leave for future use
-    # if parsed.netloc == "spdx.org":
-    #    new_value["scheme"] = "spdx"
-    #    new_value["id"] = parsed.path.removesuffix(".html").strip("/").split("/")[-1]
+    if parsed.netloc == "spdx.org":
+        new_value["scheme"] = "spdx"
+        new_value["id"] = parsed.path.removesuffix(".html").strip("/").split("/")[-1].lower()
     return new_value
