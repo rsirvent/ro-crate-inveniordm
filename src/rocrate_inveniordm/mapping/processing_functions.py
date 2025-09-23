@@ -131,12 +131,14 @@ def rightsProcessing(value):
     from urllib.parse import urlparse
 
     parsed = urlparse(value)
+    path = parsed.path.strip("/")
+    title_path = path.removesuffix(".html") if path.endswith(".html") else path
+    title = title_path.replace("/", " ").title()
     new_value = {}
-    new_value["title"] = {"en": parsed.path.strip("/").replace("/", " ").title()}
+    new_value["title"] = {"en": title}
     new_value["link"] = value
+    # spdx schema not working in Zenodo right now, leave for future use
     # if parsed.netloc == "spdx.org":
-    #     new_detail = {}
-    #     new_detail["id"] = parsed.path.strip("/").split("/")[-1]
-    #     new_detail["scheme"] = "spdx"
-    #     return (new_value, new_detail)
+    #    new_value["scheme"] = "spdx"
+    #    new_value["id"] = parsed.path.removesuffix(".html").strip("/").split("/")[-1]
     return new_value
