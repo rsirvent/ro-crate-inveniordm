@@ -67,16 +67,24 @@
 
                 "affiliation_mapping_direct": {
                     "from": "$author[].affiliation[]",
-                    "to": "metadata.creators[].affiliations[].name"
-                },
-                "affiliation_mapping_id": {
-                    "_ignore": true,
-                    "from": "$author[].$affiliation[].@id",
-                    "to": "metadata.creators[].affiliations[].id"
+                    "to": "metadata.creators[].affiliations[].name",
+                    "onlyIf": "?string"
                 },
                 "affiliation_mapping_name": {
                     "from": "$author[].$affiliation[].name",
                     "to": "metadata.creators[].affiliations[].name"
+                },
+                "affiliation_mapping_scheme": {
+                    "from": "$author[].$affiliation[].@id[]",
+                    "to": "metadata.creators[].affiliations[].scheme",
+                    "onlyIf": "?ror",
+                    "value": "ror"
+                },
+                "affiliation_mapping_id": {
+                    "from": "$author[].$affiliation[].@id",
+                    "to": "metadata.creators[].affiliations[].id",
+                    "onlyIf": "?ror",
+                    "processing": "$rorProcessing"
                 },
                 "ifNonePresent": {
                     "metadata.creators[].person_or_org.name": ":unkn",
@@ -144,16 +152,24 @@
 
                 "affiliation_mapping_direct": {
                     "from": "$contributor[].affiliation[]",
-                    "to": "metadata.contributors[].affiliations[].name"
-                },
-                "affiliation_mapping_id": {
-                    "_ignore": true,
-                    "from": "$contributor[].$affiliation[].@id",
-                    "to": "metadata.contributors[].affiliations[].id"
+                    "to": "metadata.contributors[].affiliations[].name",
+                    "onlyIf": "?string"
                 },
                 "affiliation_mapping_name": {
                     "from": "$contributor[].$affiliation[].name",
                     "to": "metadata.contributors[].affiliations[].name"
+                },
+                "affiliation_mapping_scheme": {
+                    "from": "contributor[].$affiliation[].@id[]",
+                    "to": "metadata.contributors[].affiliations[].scheme",
+                    "onlyIf": "?ror",
+                    "value": "ror"
+                },
+                "affiliation_mapping_id": {
+                    "from": "$contributor[].$affiliation[].@id",
+                    "to": "metadata.contributors[].affiliations[].id",
+                    "onlyIf": "?ror",
+                    "processing": "$rorProcessing"
                 }
             }
         },

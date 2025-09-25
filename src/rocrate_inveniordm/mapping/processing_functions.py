@@ -139,5 +139,18 @@ def rightsProcessing(value):
     new_value["link"] = value
     if parsed.netloc == "spdx.org":
         new_value["scheme"] = "spdx"
-        new_value["id"] = parsed.path.removesuffix(".html").strip("/").split("/")[-1].lower()
+        new_value["id"] = (
+            parsed.path.removesuffix(".html").strip("/").split("/")[-1].lower()
+        )
     return new_value
+
+
+def rorProcessing(value):
+    if not value:
+        return None
+
+    if not value.startswith("https://ror.org/"):
+        return None
+
+    replaced_url = value.replace("https://ror.org/", "")
+    return replaced_url

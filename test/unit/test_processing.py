@@ -29,3 +29,32 @@ def test_dateProcessing__none():
     out = pf.dateProcessing(None)
 
     assert out is None
+
+
+def test_typeProcessing_wf():
+    out = pf.typeProcessing(["File", "SoftwareSourceCode", "ComputationalWorkflow"])
+
+    assert out == "workflow"
+
+
+def test_typeProcessing_not_wf():
+    out = pf.typeProcessing(["File", "ImageObject", "WorkflowSketch"])
+
+    assert out == "dataset"
+
+
+def test_nameProcessing():
+    out = pf.nameProcessing("John Michael Smith")
+
+    assert out["family_name"] == "Smith"
+    assert out["given_name"] == "John Michael"
+    assert out["name"] == "John Michael Smith"
+
+
+def test_rightsProcessing():
+    out = pf.rightsProcessing("https://spdx.org/licenses/CC-BY-NC-ND-4.0.html")
+
+    assert out["title"] == {"en": "Licenses Cc-By-Nc-Nd-4.0"}
+    assert out["link"] == "https://spdx.org/licenses/CC-BY-NC-ND-4.0.html"
+    assert out["scheme"] == "spdx"
+    assert out["id"] == "cc-by-nc-nd-4.0"
