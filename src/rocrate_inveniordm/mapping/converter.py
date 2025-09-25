@@ -438,7 +438,7 @@ def process(process_rule, value):
     return function(value)
 
 
-def merge_authors_and_creators(rc:dict):
+def merge_authors_and_creators(rc: dict):
     """
     Copy creators to authors in the RO-Crate, so they can be processed in a single mapping.
     Mapping from 'author' to 'creators' and later from 'creator' to 'creators' causes overwritings.
@@ -450,6 +450,7 @@ def merge_authors_and_creators(rc:dict):
                 if person["@id"] not in urls_orcid:
                     item["author"].append(person)
     return rc
+
 
 if __name__ == "__main__":
     main()
