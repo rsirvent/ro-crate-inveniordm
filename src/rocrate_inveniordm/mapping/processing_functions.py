@@ -100,10 +100,15 @@ def convert_to_iso_639_3(value):
 
 def typeProcessing(value):
     """
-    Checks if the 'mainEntity' type includes 'ComputationalWorkflow'
+    Checks if the 'mainEntity' type includes 'ComputationalWorkflow'.
+    Works whether 'value' is a string or a list of strings.
     """
-    if "ComputationalWorkflow" in value:
-        return "workflow"
+    if isinstance(value, str):
+        if "ComputationalWorkflow" in value:
+            return "workflow"
+    elif isinstance(value, list):
+        if any("ComputationalWorkflow" in v for v in value if isinstance(v, str)):
+            return "workflow"
     return "dataset"
 
 

@@ -85,11 +85,11 @@
                     "to": "metadata.creators[].affiliations[].id",
                     "onlyIf": "?ror",
                     "processing": "$rorProcessing"
-                },
-                "ifNonePresent": {
-                    "metadata.creators[].person_or_org.name": ":unkn",
-                    "metadata.creators[].person_or_org.type": "organizational"
-                }   
+                }
+            },
+            "ifNonePresent": {
+                "metadata.creators[].person_or_org.name": ":unkn",
+                "metadata.creators[].person_or_org.type": "organizational"
             }
         },
 

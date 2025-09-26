@@ -31,6 +31,11 @@ def test_dateProcessing__none():
     assert out is None
 
 
+def test_typeProcessing_single():
+    out = pf.typeProcessing("Dataset")
+
+    assert out == "dataset"
+
 def test_typeProcessing_wf():
     out = pf.typeProcessing(["File", "SoftwareSourceCode", "ComputationalWorkflow"])
 
