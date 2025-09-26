@@ -1,4 +1,5 @@
-import json, copy
+import json
+import copy
 from importlib import resources
 import rocrate_inveniordm.mapping as mapping
 

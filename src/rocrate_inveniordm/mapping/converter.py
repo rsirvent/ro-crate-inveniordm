@@ -438,7 +438,7 @@ def process(process_rule, value):
 def merge_authors_and_creators(rc: dict):
     """
     Copy creators to authors in the RO-Crate, so they can be processed in a single
-    mapping. Mapping from 'author' to 'creators' and later from 'creator' to 
+    mapping. Mapping from 'author' to 'creators' and later from 'creator' to
     'creators' causes overwritings.
     """
     for rde in rc["@graph"]:
