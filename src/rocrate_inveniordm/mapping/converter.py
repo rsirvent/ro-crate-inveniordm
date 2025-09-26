@@ -66,7 +66,7 @@ def convert(rc: dict, metadata_only: bool = False) -> dict:
         raise MappingException("Mapping does not contain a '$root' key.")
 
     for mapping_class in root_rules:
-        # print()
+        print()
 
         # Ignore mappings that are marked as ignored
         if "_ignore" in root_rules.get(mapping_class).keys():
@@ -441,12 +441,17 @@ def merge_authors_and_creators(rc: dict):
     mapping. Mapping from 'author' to 'creators' and later from 'creator' to 
     'creators' causes overwritings.
     """
-    for item in rc["@graph"]:
-        if "creator" in item:
-            for person in item["creator"]:
-                urls_orcid = [name["@id"] for name in item["author"]]
-                if person["@id"] not in urls_orcid:
-                    item["author"].append(person)
+    for rde in rc["@graph"]:
+        if "creator" in rde:
+            for person_or_org in rde["creator"]:
+                if isinstance(person_or_org, str):
+                    added_authors = [item for item in rde["author"]]
+                    if person_or_org not in added_authors:
+                        rde["author"].append(person_or_org)
+                    continue
+                urls_orcid = [item["@id"] for item in rde["author"]]
+                if person_or_org["@id"] not in urls_orcid:
+                    rde["author"].append(person_or_org)
     return rc
 
 

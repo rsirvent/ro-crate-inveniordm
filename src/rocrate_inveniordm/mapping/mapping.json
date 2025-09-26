@@ -13,10 +13,11 @@
 
         "creators_mapping": {
             "mappings": {
-                "author_name_mapping": {
+                "person_or_org_entity_empty_name_mapping": {
+                    "_ignore": true,
                     "from": "author[].name",
                     "to": "metadata.creators[].person_or_org.name",
-                    "ifNonePresent": ":unkn"
+                    "value": ":unkn"
                 },
                 "person_or_org_type_mapping_name_to_family_and_given": {
                     "from": "$author[].name",
@@ -96,6 +97,7 @@
         "contributors_mapping": {
             "mappings": {
                 "person_or_org_type_mapping_name_to_family_and_given": {
+                    "_ignore": true,
                     "from": "$contributor[].name",
                     "to": "metadata.contributors[].person_or_org",
                     "processing": "$nameProcessing"
