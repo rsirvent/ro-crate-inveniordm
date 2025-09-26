@@ -36,6 +36,7 @@ def test_typeProcessing_single():
 
     assert out == "dataset"
 
+
 def test_typeProcessing_wf():
     out = pf.typeProcessing(["File", "SoftwareSourceCode", "ComputationalWorkflow"])
 
