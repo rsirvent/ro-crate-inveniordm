@@ -407,11 +407,11 @@
         "locations_mapping": {
             "mappings": {
                 "location_mapping_1": {
-                    "from": "$contentLocation.name",
+                    "from": "$contentLocation[].name",
                     "to": "metadata.locations[].features[].place"
                 },
                 "location_mapping_id_geonames": {
-                    "from": "$contentLocation.@id",
+                    "from": "$contentLocation[].@id",
                     "to": "metadata.locations[].features[].identifiers[]",
                     "processing": "$geonamesProcessing",
                     "value": {
