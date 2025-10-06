@@ -8,6 +8,9 @@
                     "to": "metadata.resource_type.id",
                     "processing": "$typeProcessing"
                 }
+            },
+             "ifNonePresent": {
+                "metadata.resource_type.id": "dataset"
             }
         },
 
