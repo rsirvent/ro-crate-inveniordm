@@ -462,25 +462,7 @@ def merge_authors_and_creators(rc: dict):
                 ]
                 if person_or_org["@id"] not in urls_orcid:
                     rde["author"].append(person_or_org)
-
-        # if "creator" in rde:
-        #     for person_or_org in rde["creator"]:
-        #         if isinstance(person_or_org, str):
-        #             # Collect existing author strings
-        #             existing_strings = [a for a in rde["author"] if isinstance(a, str)]
-        #             if person_or_org not in existing_strings:
-        #                 rde["author"].append(person_or_org)
-        #         elif isinstance(person_or_org, dict) and "@id" in person_or_org:
-        #             # Collect existing author ids
-        #             existing_ids = [
-        #                 a["@id"] for a in rde["author"] if isinstance(a, dict) and "@id" in a
-        #             ]
-        #             if person_or_org["@id"] not in existing_ids:
-        #                 rde["author"].append(person_or_org)
-        #         else:
-        #             # Fallback: append as is if type is unexpected
-        #             if person_or_org not in rde["author"]:
-        #                 rde["author"].append(person_or_org)
+                    
     return rc
 
 
