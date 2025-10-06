@@ -455,7 +455,11 @@ def merge_authors_and_creators(rc: dict):
                     if person_or_org not in added_authors:
                         rde["author"].append(person_or_org)
                     continue
-                urls_orcid = [item["@id"] for item in rde["author"] if isinstance(item, dict) and "@id" in item]
+                urls_orcid = [
+                    item["@id"]
+                    for item in rde["author"]
+                    if isinstance(item, dict) and "@id" in item
+                ]
                 if person_or_org["@id"] not in urls_orcid:
                     rde["author"].append(person_or_org)
 
