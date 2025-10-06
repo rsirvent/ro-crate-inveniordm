@@ -119,7 +119,10 @@ def nameProcessing(value):
     """
 
     if not value:
-        return None
+        # With this we ensure that even if the author name is not mapped, at least
+        # its path index will be correctly set. That's why nameProcessing must be
+        # the first rule to be applied to support authors specified as strings
+        return {"type": "organizational", "name": ":unkn"}
 
     new_name = {}
     parts = value.strip().split()

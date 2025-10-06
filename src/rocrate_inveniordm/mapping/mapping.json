@@ -13,12 +13,7 @@
 
         "creators_mapping": {
             "mappings": {
-                "person_or_org_entity_empty_name_mapping": {
-                    "_ignore": true,
-                    "from": "author[].name",
-                    "to": "metadata.creators[].person_or_org.name",
-                    "value": ":unkn"
-                },
+                
                 "person_or_org_type_mapping_name_to_family_and_given": {
                     "from": "$author[].name",
                     "to": "metadata.creators[].person_or_org",
@@ -32,7 +27,6 @@
                     "from": "$author[].familyName",
                     "to": "metadata.creators[].person_or_org.family_name"
                 },
-
                 "person_or_org_type_mapping_direct": {
                     "from": "author[]",
                     "to": "metadata.creators[].person_or_org",
@@ -42,6 +36,7 @@
                     },
                     "onlyIf": "?string"
                 },
+ 
                 "person_or_org_type_mapping": {
                     "from": "$author[].@type",
                     "to": "metadata.creators[].person_or_org.type",

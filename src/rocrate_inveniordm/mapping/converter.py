@@ -199,12 +199,12 @@ def apply_mapping(mapping, mapping_paths, rc, dc, mapping_key):  # noqa: C901
             # must be implemented on how to handle it)
             print(
                 "\t\t|- Result is a JSON object, so this rule cannot be applied. "
-                "Skipping to next rule."
+                "Skipping to next path."
             )
             from_value = None
 
-        # if (from_value is None):
-        #    continue
+        if from_value is None:
+            continue
 
         if only_if_value is not None:
             print(f"\t\t|- Checking condition {only_if_value}")
@@ -223,8 +223,8 @@ def apply_mapping(mapping, mapping_paths, rc, dc, mapping_key):  # noqa: C901
                 f"{path.copy()}"
             )
             rule_applied = True
-            print(dc, to_mapping_value, from_value)
             dc = set_dc(dc, to_mapping_value, from_value, path.copy())
+            print(dc)
 
     return dc, rule_applied
 
@@ -373,8 +373,12 @@ def set_dc(dictionary, key, value=None, path=[]):
             path = path[1:]
             last_val = current_dict[key_part[:-2]]
 
-            if len(current_dict[key_part[:-2]]) <= index:
-                current_dict[key_part[:-2]].append({})
+            while len(current_dict[key_part[:-2]]) <= index:
+                current_dict[key_part[:-2]].append(
+                    {}
+                )  # It expands 1 by 1 anyway, since no empty paths can remain after a mapping rule is applied
+
+            # print(f"INDEX: {index}, len of key: {len(current_dict[key_part[:-2]])}")
 
             current_dict = current_dict[key_part[:-2]][index]
 
@@ -441,6 +445,9 @@ def merge_authors_and_creators(rc: dict):
     mapping. Mapping from 'author' to 'creators' and later from 'creator' to
     'creators' causes overwritings.
     """
+
+    return rc
+
     for rde in rc["@graph"]:
         if "creator" in rde:
             for person_or_org in rde["creator"]:
