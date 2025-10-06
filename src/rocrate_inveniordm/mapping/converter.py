@@ -376,7 +376,8 @@ def set_dc(dictionary, key, value=None, path=[]):
             while len(current_dict[key_part[:-2]]) <= index:
                 current_dict[key_part[:-2]].append(
                     {}
-                )  # It expands 1 by 1 anyway, since no empty paths can remain after a mapping rule is applied
+                )  # It expands 1 by 1 anyway, since no empty paths can remain after
+                # a mapping rule is applied
 
             # print(f"INDEX: {index}, len of key: {len(current_dict[key_part[:-2]])}")
 
@@ -446,8 +447,6 @@ def merge_authors_and_creators(rc: dict):
     'creators' causes overwritings.
     """
 
-    return rc
-
     for rde in rc["@graph"]:
         if "creator" in rde:
             for person_or_org in rde["creator"]:
@@ -456,9 +455,28 @@ def merge_authors_and_creators(rc: dict):
                     if person_or_org not in added_authors:
                         rde["author"].append(person_or_org)
                     continue
-                urls_orcid = [item["@id"] for item in rde["author"]]
+                urls_orcid = [item["@id"] for item in rde["author"] if isinstance(item, dict) and "@id" in item]
                 if person_or_org["@id"] not in urls_orcid:
                     rde["author"].append(person_or_org)
+
+        # if "creator" in rde:
+        #     for person_or_org in rde["creator"]:
+        #         if isinstance(person_or_org, str):
+        #             # Collect existing author strings
+        #             existing_strings = [a for a in rde["author"] if isinstance(a, str)]
+        #             if person_or_org not in existing_strings:
+        #                 rde["author"].append(person_or_org)
+        #         elif isinstance(person_or_org, dict) and "@id" in person_or_org:
+        #             # Collect existing author ids
+        #             existing_ids = [
+        #                 a["@id"] for a in rde["author"] if isinstance(a, dict) and "@id" in a
+        #             ]
+        #             if person_or_org["@id"] not in existing_ids:
+        #                 rde["author"].append(person_or_org)
+        #         else:
+        #             # Fallback: append as is if type is unexpected
+        #             if person_or_org not in rde["author"]:
+        #                 rde["author"].append(person_or_org)
     return rc
 
 
