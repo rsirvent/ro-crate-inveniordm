@@ -462,7 +462,7 @@ def merge_authors_and_creators(rc: dict):
                 ]
                 if person_or_org["@id"] not in urls_orcid:
                     rde["author"].append(person_or_org)
-                    
+
     return rc
 
 
