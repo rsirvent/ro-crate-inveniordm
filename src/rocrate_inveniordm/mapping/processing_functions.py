@@ -139,11 +139,8 @@ def rightsProcessing(value):
     from urllib.parse import urlparse
 
     parsed = urlparse(value)
-    path = parsed.path.strip("/")
-    title_path = path.removesuffix(".html") if path.endswith(".html") else path
-    title = title_path.replace("/", " ").title()
     new_value = {}
-    new_value["title"] = {"en": title}
+    new_value["title"] = {"en": value}
     new_value["link"] = value
     if parsed.netloc == "spdx.org":
         new_value["scheme"] = "spdx"

@@ -379,7 +379,6 @@ def set_dc(dictionary, key, value=None, path=[]):
                 )  # It expands 1 by 1 anyway, since no empty paths can remain after
                 # a mapping rule is applied
 
-
             current_dict = current_dict[key_part[:-2]][index]
 
         elif key_part not in current_dict and not key_part.endswith("[]"):
