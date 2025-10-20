@@ -379,7 +379,6 @@ def set_dc(dictionary, key, value=None, path=[]):
                 )  # It expands 1 by 1 anyway, since no empty paths can remain after
                 # a mapping rule is applied
 
-            # print(f"INDEX: {index}, len of key: {len(current_dict[key_part[:-2]])}")
 
             current_dict = current_dict[key_part[:-2]][index]
 
