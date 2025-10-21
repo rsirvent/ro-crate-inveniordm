@@ -140,13 +140,16 @@ def rightsProcessing(value):
 
     parsed = urlparse(value)
     new_value = {}
-    new_value["title"] = {"en": value}
     new_value["link"] = value
+    #  The InvenioRDM docs say "either id or title must be passed, but not both
     if parsed.netloc == "spdx.org":
         new_value["scheme"] = "spdx"
         new_value["id"] = (
             parsed.path.removesuffix(".html").strip("/").split("/")[-1].lower()
         )
+    else:
+        new_value["title"] = {"en": value}
+    
     return new_value
 
 

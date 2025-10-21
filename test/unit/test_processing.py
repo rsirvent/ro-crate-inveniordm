@@ -57,10 +57,18 @@ def test_nameProcessing():
     assert out["name"] == "John Michael Smith"
 
 
-def test_rightsProcessing():
+def test_rightsProcessing_spdx():
     out = pf.rightsProcessing("https://spdx.org/licenses/CC-BY-NC-ND-4.0.html")
 
-    assert out["title"] == {"en": "https://spdx.org/licenses/CC-BY-NC-ND-4.0.html"}
-    assert out["link"] == "https://spdx.org/licenses/CC-BY-NC-ND-4.0.html"
-    assert out["scheme"] == "spdx"
+    assert "title" not in out
     assert out["id"] == "cc-by-nc-nd-4.0"
+    assert out["scheme"] == "spdx"
+    assert out["link"] == "https://spdx.org/licenses/CC-BY-NC-ND-4.0.html"
+
+
+def test_rightsProcessing_non_spdx():
+    out = pf.rightsProcessing("https://licensewebsite.org/licenses/1.0/")
+
+    assert not "id" in out
+    assert out["title"] == {"en": "https://licensewebsite.org/licenses/1.0/"}
+    assert out["link"] == "https://licensewebsite.org/licenses/1.0/"
