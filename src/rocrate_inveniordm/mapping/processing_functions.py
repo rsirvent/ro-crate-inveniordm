@@ -149,7 +149,7 @@ def rightsProcessing(value):
         )
     else:
         new_value["title"] = {"en": value}
-    
+
     return new_value
 
 
