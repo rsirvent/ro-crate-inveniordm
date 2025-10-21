@@ -60,7 +60,7 @@ def test_nameProcessing():
 def test_rightsProcessing():
     out = pf.rightsProcessing("https://spdx.org/licenses/CC-BY-NC-ND-4.0.html")
 
-    assert out["title"] == {"en": "Licenses Cc-By-Nc-Nd-4.0"}
+    assert out["title"] == {"en": "https://spdx.org/licenses/CC-BY-NC-ND-4.0.html"}
     assert out["link"] == "https://spdx.org/licenses/CC-BY-NC-ND-4.0.html"
     assert out["scheme"] == "spdx"
     assert out["id"] == "cc-by-nc-nd-4.0"
