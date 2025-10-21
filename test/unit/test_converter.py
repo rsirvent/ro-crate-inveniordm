@@ -101,8 +101,12 @@ def test_adds_dict_creator_with_id():
     rc = {
         "@graph": [
             {
-                "author": [{"@id": "https://orcid.org/0000-0000-0000-0001", "name": "Alice"}],
-                "creator": [{"@id": "https://orcid.org/0000-0000-0000-0002", "name": "Bob"}],
+                "author": [
+                    {"@id": "https://orcid.org/0000-0000-0000-0001", "name": "Alice"}
+                ],
+                "creator": [
+                    {"@id": "https://orcid.org/0000-0000-0000-0002", "name": "Bob"}
+                ],
             }
         ]
     }
@@ -116,8 +120,12 @@ def test_skips_existing_dict_creator_by_id():
     rc = {
         "@graph": [
             {
-                "author": [{"@id": "https://orcid.org/0000-0000-0000-0002", "name": "Bob"}],
-                "creator": [{"@id": "https://orcid.org/0000-0000-0000-0002", "name": "Bob"}],
+                "author": [
+                    {"@id": "https://orcid.org/0000-0000-0000-0002", "name": "Bob"}
+                ],
+                "creator": [
+                    {"@id": "https://orcid.org/0000-0000-0000-0002", "name": "Bob"}
+                ],
             }
         ]
     }
@@ -132,8 +140,14 @@ def test_mixed_string_and_dict_creators():
     rc = {
         "@graph": [
             {
-                "author": ["Alice", {"@id": "https://orcid.org/0000-0000-0000-0001", "name": "A"}],
-                "creator": ["Charlie", {"@id": "https://orcid.org/0000-0000-0000-0002", "name": "C"}],
+                "author": [
+                    "Alice",
+                    {"@id": "https://orcid.org/0000-0000-0000-0001", "name": "A"},
+                ],
+                "creator": [
+                    "Charlie",
+                    {"@id": "https://orcid.org/0000-0000-0000-0002", "name": "C"},
+                ],
             }
         ]
     }
